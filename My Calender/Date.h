@@ -21,11 +21,11 @@ public:
 	void setYear(int);
 
 	void printDate() const;
-	bool operator<(const Date&);
-	bool operator==(const Date&); //test
+	bool operator<(const Date&) const;
+	bool operator==(const Date&) const; //test
 
-	bool isLeap();
-	int maxDays();
+	bool isLeap() const;
+	int maxDays() const;
 
 	std::istream& read(std::istream&);
 	std::ostream& write(std::ostream&) const;
