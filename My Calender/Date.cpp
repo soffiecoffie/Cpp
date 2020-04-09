@@ -46,25 +46,13 @@ void Date::setMonth(int _month)
 
 void Date::setYear(int _year)
 {
-	assert(_year > 1920 && _year < 2100);							//is the time frame adequate
+	assert(_year > 1920 && _year < 2100);		//is the time frame adequate
 	this->year = _year;
 }
 
 void Date::printDate() const
 {
 	this->write(std::cout);
-	
-	/*std::cout << year << '-';
-
-	if(month / 10 == 0)
-		std::cout << "0" << month << '-';
-	else
-	std::cout << month << '-';
-
-	if (day / 10 == 0)
-		std::cout << "0" << day;
-	else
-		std::cout << day;*/
 }
 
 bool Date::operator<(const Date& other) const
@@ -89,8 +77,8 @@ bool Date::isLeap() const
 }
 
 
-int Date::maxDays() const
-{												//is this the best optimization?
+int Date::maxDays() const //is this the best optimization?
+{		
 	switch (this->month) {
 	case 2:
 		return (isLeap()) ? 29 : 28;
