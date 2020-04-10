@@ -43,7 +43,6 @@ int main()
 		menu.printOptions();
 		std::cin >> choice;
 
-
 		//add seperate func for this
 		while (std::cin.fail()) //if someone puts letters/words in the choice variable instead of numbers
 		{
@@ -52,9 +51,11 @@ int main()
 			std::cout << "\nInvalid input, please enter a digit from 1 to 4: " << std::endl;
 			std::cin >> choice;
 		}
-		//!!!!fix tomorrow!!!!!!!!!!!---------------------------------------------------------------------------------
-		//when i say 4 it doesnt go inside close because menu.choice is on top;
+
 		menu.setInput(choice);
+
+		if (choice == 4) menu.choice();
+
 	} while (!menu.getIsDone());
 
 
