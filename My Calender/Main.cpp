@@ -8,9 +8,6 @@
 #include "Com.h"
 #include "Menu.h"
 
-//void choiceActions(int choice, std::ofstream& myFile, char* userFile, std::ifstream& someFile);
-//void open1(std::ifstream& fileName, std::ofstream& myFile);
-
 int main()
 {
 	std::cout << "Welcome to your personal calendar!\n----------------------------------\n\nTo open your calendar write \"1\"\nTo exit write \"4\"\n";
