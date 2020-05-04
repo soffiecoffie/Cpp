@@ -18,7 +18,7 @@ public:
 	void setMinutes(int);
 
 	bool operator<(const Time&) const;
-	bool operator==(const Time&) const; //test
+	bool operator==(const Time&) const; 
 
 	void print() const;
 
