@@ -82,13 +82,14 @@ std::ostream& Time::write(std::ostream& out) const
 //чете времето
 std::istream& Time::read(std::istream& in)
 {
-	in >> this->hour;
-
 	int num;
+	in >> num;
+	setHour(num);
+
 	in.ignore(1, ':');
 	in >> num;
-	if (num != 0) this->minutes = num;
-	else in >> this->minutes;
+	if (num == 0) in >> num;
+	setMinutes(num);
 
 	return in;
 }
