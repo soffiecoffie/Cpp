@@ -62,7 +62,7 @@ void Date::setYear(int _year)
 }
 
 //принтира датата на екрана
-void Date::printDate() const
+void Date::print() const
 {
 	this->write(std::cout);
 }
@@ -116,18 +116,19 @@ int Date::maxDays() const
 //прочита дата
 std::istream& Date::read(std::istream& in)
 {
-	in >> this->year;
-
-	in.ignore(1, '-');
 	int num;
 	in >> num;
-	if (num != 0) this->month = num;
-	else in >> this->month;
+	setYear(num);
 
 	in.ignore(1, '-');
 	in >> num;
-	if (num != 0) this->day = num;
-	else in >> this->day;
+	if (num == 0) in >> num;
+	setMonth(num);
+
+	in.ignore(1, '-');
+	in >> num;
+	if (num == 0) in >> num;
+	setDay(num);
 
 	return in;
 }
