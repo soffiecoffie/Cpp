@@ -20,7 +20,7 @@ public:
 	void setMonth(int);
 	void setYear(int);
 
-	void printDate() const;
+	void print() const;
 	bool operator<(const Date&) const;
 	bool operator==(const Date&) const; //test
 
