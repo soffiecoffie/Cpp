@@ -4,21 +4,21 @@
 
 class Date {
 private:
-	int day;
-	int month;
 	int year;
+	int month;
+	int day;
 
 public:
 	Date();
 	Date(int, int, int);
 
-	int getDay() const;
-	int getMonth() const;
 	int getYear() const;
+	int getMonth() const;
+	int getDay() const;
 
-	void setDay(int);
-	void setMonth(int);
 	void setYear(int);
+	void setMonth(int);
+	void setDay(int);
 
 	void print() const;
 	bool operator<(const Date&) const;
