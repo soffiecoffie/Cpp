@@ -88,7 +88,6 @@ std::istream& Time::read(std::istream& in)
 
 	in.ignore(1, ':');
 	in >> num;
-	if (num == 0) in >> num;
 	setMinutes(num);
 
 	return in;
