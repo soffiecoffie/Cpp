@@ -22,7 +22,7 @@ public:
 
 	void print() const;
 	bool operator<(const Date&) const;
-	bool operator==(const Date&) const; //test
+	bool operator==(const Date&) const;
 
 	bool isLeap() const;
 	int maxDays() const;
