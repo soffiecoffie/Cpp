@@ -122,12 +122,10 @@ std::istream& Date::read(std::istream& in)
 
 	in.ignore(1, '-');
 	in >> num;
-	if (num == 0) in >> num;
 	setMonth(num);
 
 	in.ignore(1, '-');
 	in >> num;
-	if (num == 0) in >> num;
 	setDay(num);
 
 	return in;
