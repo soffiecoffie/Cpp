@@ -7,28 +7,16 @@
 #include "Date.h"
 
 //конструктор по подразбиране
-Date::Date() : day(1), month(1), year(2020)
+Date::Date() : year(2020), month(1), day(1)
 {
 }
 
 //конструктор с параметри
-Date::Date(int _day, int _month, int _year)
+Date::Date(int _year, int _month, int _day)
 {
 	this->setYear(_year);
-	this->setDay(_day);
 	this->setMonth(_month);
-}
-
-//връща деня
-int Date::getDay() const
-{
-	return day;
-}
-
-//връща месеца
-int Date::getMonth() const
-{
-	return month;
+	this->setDay(_day);
 }
 
 //връща годината
@@ -37,12 +25,24 @@ int Date::getYear() const
 	return year;
 }
 
-//променя деня
-void Date::setDay(int _day)
+//връща месеца
+int Date::getMonth() const
 {
-	//проверява дали подаденият ден е валиден и ако не е прекратява програмата
-	assert(_day > 0 && _day < maxDays());
-	this->day = _day;
+	return month;
+}
+
+//връща деня
+int Date::getDay() const
+{
+	return day;
+}
+
+//променя годината
+void Date::setYear(int _year)
+{
+	//проверява дали подадената година е валидна и ако не е прекратява програмата
+	assert(_year > 1920 && _year < 2100);							//is the time frame adequate
+	this->year = _year;
 }
 
 //променя месеца
@@ -53,12 +53,12 @@ void Date::setMonth(int _month)
 	this->month = _month;
 }
 
-//променя годината
-void Date::setYear(int _year)
+//променя деня
+void Date::setDay(int _day)
 {
-	//проверява дали подадената година е валидна и ако не е прекратява програмата
-	assert(_year > 1920 && _year < 2100);							//is the time frame adequate
-	this->year = _year;
+	//проверява дали подаденият ден е валиден и ако не е прекратява програмата
+	assert(_day > 0 && _day < maxDays());
+	this->day = _day;
 }
 
 //принтира датата на екрана
