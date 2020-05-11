@@ -3,8 +3,10 @@
 #include "Arrangement.h"
 
 class Schedule {
-	Arrangement* arr;
 	size_t size;
+	Arrangement* arr;
+
+	void addSize(size_t);
 
 public:
 	Schedule() : arr(nullptr), size(0) {};
@@ -13,7 +15,8 @@ public:
 	void book(const Arrangement&);
 	void unbook(const Date&, MeetingTime);
 
-	bool overlap(const Arrangement) const;
+
+	bool overlap(const Arrangement&) const;
 	void print() const;
 	void agenda(const Date& date) const;
 };
