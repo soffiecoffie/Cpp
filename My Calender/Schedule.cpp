@@ -1,6 +1,7 @@
 #include "Schedule.h"
 #include <iostream>
 #include <cassert>
+#include <vector>
 
 //увеличава големината в зависимост от подадената големина
 void Schedule::addSize(size_t n)
@@ -26,7 +27,8 @@ void Schedule::addSize(size_t n)
 bool Schedule::hasStr(const char* original, const char* str) const
 {
 	int count = 0;
-	int ind, i = 0;
+	int ind;
+	size_t i = 0;
 	if (strlen(str) > strlen(original)) return false;
 
 	for (size_t j = 0; j < strlen(str); )
@@ -49,7 +51,7 @@ bool Schedule::hasStr(const char* original, const char* str) const
 	return false;
 }
 
-Schedule::Schedule(Arrangement* _arr, size_t _size): size(_size), arr(new Arrangement[size])
+Schedule::Schedule(const Arrangement* _arr, size_t _size): size(_size), arr(new Arrangement[size])
 {
 	for (size_t i = 0; i < size; ++i)
 	{
@@ -68,13 +70,16 @@ int Schedule::findIndex(const Date& d, const Time& start)
 	return -1;
 }
 
-int Schedule::getBusyHours(const Date& d) const
+size_t Schedule::getBusyMinutes(const Date& d) const
 {
-	//Dumb questions:
-	//kakva trqbva da e tochnostta
-	//kolko chasa rabota ima za celiq den t.e - 15:59-17:01 - shte e floor(1chas i 2 min)=1chas 
-	//ili kolko chasa ot denq imat zaetost t.e - 15:59-17:01 - shte sa 3
-	return 0;
+	int length = 0;
+	for (size_t i = 0; i < size; ++i)
+	{
+		if (arr[i].getDay() == d) {
+			length += arr[i].getLength();
+		}
+	}
+	return length;
 }
 
 bool Schedule::overlap(const Arrangement& other) const
@@ -96,13 +101,92 @@ bool Schedule::overlapOthers(const Arrangement& other, int ind) const
 	return false;
 }
 
+void Schedule::swapArrangements(size_t i, size_t j)
+{
+	Arrangement temp;
+	temp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = temp;
+}
+
+void Schedule::sortChronologically()
+{
+	int min;
+	for (size_t i = 0; i < size - 1; ++i) {
+		min = i;
+
+		for (size_t j = i + 1; j < size; ++j) {
+			if (arr[j].getDay() < arr[min].getDay() 
+				|| (arr[j].getDay() == arr[min].getDay() && arr[j].getTime().start < arr[min].getTime().start)) {
+				min = j;
+			}
+		}
+		swapArrangements(min, i);
+	}
+}
+
+bool Schedule::isHoliday(const Date& d) const
+{
+	for (size_t i = 0; i < size; ++i)
+	{
+		if (d == arr[i].getDay() && arr[i].getHoliday()) return true;
+	}
+	return false;
+}
+
+bool Schedule::hasFreeSlot(const Date& d, size_t hours) const
+{
+	int h = 8, m;
+	do {
+		if (!isHoliday(d)) {
+			for (m = 0; m < 59; ++m)
+			{
+				if (overlap(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m))))) {
+					if (m == 59) {
+						++h;
+					}
+				}
+				else return true;
+			}
+		}
+		else break;
+	} while (h <= 16 && h + hours <= 16 && m <= 59);
+
+	return false;
+}
+
+MeetingTime Schedule::getFreeSlot(const Date& d, size_t hours) const
+{
+	if (hasFreeSlot(d, hours)) {
+		int h = 8, m;
+		do {
+			if (!isHoliday(d)) {
+				for (m = 0; m < 59; ++m)
+				{
+					if (overlap(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m))))) {
+						if (m == 59) {
+							++h;
+						}
+					}
+					else return MeetingTime(Time(h, m), Time(h + hours, m));
+				}
+			}
+			else break;
+		} while (h <= 16 && h + hours <= 16 && m <= 59);
+	}
+
+	return MeetingTime(Time(0, 0), Time(0, 0));
+}
+
+
+
+
 void Schedule::print() const
 {
 	for (size_t i = 0; i < size; ++i)
 	{
-		std::cout << "Arrangement " << i + 1 << '\n';//yes?
+		std::cout << "Arrangement " << i + 1 << '\n';
 		arr[i].print();
-//		std::cout << '\n';
 	}
 }
 
@@ -143,9 +227,11 @@ void Schedule::unbook(const Date& date, MeetingTime time)
 	}
 }
 
-void Schedule::agenda(const Date& date) const
+void Schedule::agenda(const Date& date) 
 {
 	bool empty = 1;
+	std::cout << "Agenda for the day " << date << ":\n\n";
+	sortChronologically();
 	for (size_t i = 0; i < size; ++i)
 	{
 		if (arr[i].getDay() == date && arr[i].getHoliday()) {
@@ -154,7 +240,7 @@ void Schedule::agenda(const Date& date) const
 		}
 		else if (arr[i].getDay() == date) {
 			arr[i].print();
-			std::cout << "_______________________________________\n\n\n";
+			std::cout << "________________________________________\n\n\n";
 			empty = 0;
 		}
 	}
@@ -247,5 +333,82 @@ void Schedule::holiday(const Date& d)
 
 void Schedule::busydays(const Date& from, const Date& to) const
 {
-	//TODO
+	std::vector<Date> interval;
+
+	Date add;
+	interval.push_back(from);
+	do {
+		add = interval[interval.size() - 1].getNextDay();
+		interval.push_back(add);
+	} while (add < to);
+
+	std::cout << "All days from " << from << " to " << to << " sorted by busyness: \n\n";
+	
+	size_t* ind = new size_t[interval.size()];
+	for (size_t i = 0; i < interval.size(); ++i)
+	{
+		ind[i] = getBusyMinutes(interval[i]);
+	}
+
+	int max;
+	for (size_t i = 0; i < interval.size() - 1; ++i)
+	{
+		max = i;
+		for (size_t j = i + 1; j < interval.size(); ++j) {
+			if (ind[i] < ind[j]) {
+				max = j;
+			}
+		}
+		std::swap(interval[i], interval[max]);
+		std::swap(ind[i], ind[max]);
+	}
+
+	for (size_t i = 0; i < interval.size(); i++)
+	{
+		std::cout << interval[i] << std::endl;
+	}
 }
+
+Date Schedule::findslot(const Date& from, size_t hours) const
+{
+	Date d;
+	d = from;
+	do {
+		if (hasFreeSlot(d, hours)) {
+			return d;
+		}
+		else d = d.getNextDay();
+	} while (true);
+}
+
+Date Schedule::findslotwith(const Date& from, size_t hours, const Schedule* calendars, size_t sizeCalendars) const
+{
+	//TODO
+	//Date d, temp;
+	//temp = from;
+	//do {
+	//	d = findslot(temp, hours);
+	//	
+	//} while (true);
+}
+
+Date Schedule::findslotwithOneCal(const Date& from, size_t hours, const Schedule& cal) const
+{
+	Date d, temp;
+	temp = from;
+	do {
+		d = findslot(temp, hours);
+		if (cal.hasFreeSlot(d, hours)) {
+			if (getFreeSlot(d, hours) == cal.getFreeSlot(d, hours)) {
+				return d;
+			}
+		}
+		else {
+			temp = d;
+		}
+	} while (true);
+}
+		//for (size_t i = 0; i < sizeCalendars; ++i)
+		//{
+		//	
+		//}
