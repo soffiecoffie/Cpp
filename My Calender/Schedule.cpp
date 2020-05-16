@@ -64,7 +64,7 @@ size_t Schedule::getSize() const
 	return size;
 }
 
-Arrangement Schedule::getArrangement(size_t ind) const
+Arrangement& Schedule::getArrangement(size_t ind) const
 {
 	return arr[ind];
 }
@@ -111,7 +111,7 @@ bool Schedule::overlapOthers(const Arrangement& other, int ind) const
 	return false;
 }
 
-Arrangement Schedule::getOverlappedArr(const Arrangement& other) const
+Arrangement& Schedule::getOverlappedArr(const Arrangement& other) const
 {
 	assert(overlap(other));
 	for (size_t i = 0; i < size; ++i)
@@ -160,46 +160,31 @@ bool Schedule::isHoliday(const Date& d) const
 
 bool Schedule::hasFreeSlot(const Date& d, size_t hours) const
 {
-	int h = 8, m;
-	do {
-		if (!isHoliday(d)) {
-			for (m = 0; m < 59; ++m)
-			{
-				if (overlap(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m))))) {
-					if (m == 59) {
-						++h;
-					}
-				}
-				else return true;
+	int h = 8, m = 0;
+	if (!isHoliday(d)) {
+		do {
+			if (overlap(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m))))) {
+				h = getOverlappedArr(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m)))).getTime().end.getHour();
+				m = getOverlappedArr(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m)))).getTime().end.getMinutes();
 			}
-		}
-		else break;
-	} while (h <= 16 && h + hours <= 16 && m <= 59);
+			else return true;
+		} while (h <= 16 && h + hours <= 16 && m <= 59);
+	}
 
 	return false;
 }
 
 MeetingTime Schedule::getFreeSlot(const Date& d, size_t hours) const
 {
-	if (hasFreeSlot(d, hours)) {
-		int h = 8, m;
-		do {
-			if (!isHoliday(d)) {
-				for (m = 0; m < 59; ++m)
-				{
-					if (overlap(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m))))) {
-						if (m == 59) {
-							++h;
-						}
-					}
-					else return MeetingTime(Time(h, m), Time(h + hours, m));
-				}
-			}
-			else break;
-		} while (h <= 16 && h + hours <= 16 && m <= 59);
-	}
-
-	return MeetingTime(Time(0, 0), Time(0, 0));
+	assert(hasFreeSlot(d, hours));
+	int h = 8, m = 0;
+	do {
+		if (overlap(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m))))) {
+			h = getOverlappedArr(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m)))).getTime().end.getHour();
+			m = getOverlappedArr(Arrangement(d, MeetingTime(Time(h, m), Time(h + hours, m)))).getTime().end.getMinutes();
+		}
+		else return MeetingTime(Time(h, m), Time(h + hours, m));
+	} while (h <= 16 && h + hours <= 16 && m <= 59);
 }
 
 Schedule Schedule::allBusyHours(const Schedule* cal, size_t calSize) const
@@ -228,6 +213,7 @@ Schedule& Schedule::operator=(const Schedule& other)
 {
 	if (this != &other) {
 		size = other.getSize();
+		
 		delete[] arr;
 		arr = new Arrangement[size];
 		for (size_t i = 0; i < size; ++i)
@@ -245,6 +231,38 @@ void Schedule::print() const
 		std::cout << "Arrangement " << i + 1 << '\n';
 		arr[i].print();
 	}
+}
+
+std::istream& Schedule::read(std::istream& in)
+{
+	char* temp = new char[50];
+	size_t num;
+	in.ignore(100, '\n');
+	in.ignore(22);
+	in >> num;
+	size = num;
+	in.ignore(50, '\n');//\n');
+	in.ignore(1);
+	arr = new Arrangement[size];
+	for (size_t i = 0; i < size; ++i)
+	{
+		arr[i].read(in);
+		in.ignore(2, '\n\n');
+	}
+
+	return in;
+}
+
+std::ostream& Schedule::write(std::ostream& out) const
+{
+	out << "Welcome to your personal calendar!\n"
+		<< "These are all of your " << size << " arrangements: \n\n";
+	for (size_t i = 0; i < size; ++i)
+	{
+		arr[i].write(out);
+		out << "\n\n";
+	}
+	return out;
 }
 
 void Schedule::book(const Arrangement& other)
@@ -473,14 +491,13 @@ Date Schedule::findslotwithOneCal(const Date& from, size_t hours, const Schedule
 
 void Schedule::merge(const Schedule* cals, size_t calSize)
 {
-	
+	Arrangement newArr;
 	for (size_t i = 0; i < calSize; ++i)
 	{
 		for (size_t j = 0; j < cals[i].getSize(); ++j)
 		{
 			//only works if 2 arrangements at most overlap
 			if (overlap(cals[i].getArrangement(j))) {
-				Arrangement newArr;
 				bool okay = true;
 				newArr = cals[i].getArrangement(j);
 				do {
@@ -512,7 +529,6 @@ void Schedule::merge(const Schedule* cals, size_t calSize)
 					std::cout << "Enter your preffered end time for the arrangement: \n";
 					std::cin >> newEnd;
 
-					Arrangement newArr;
 					//if (num == 1) {
 					//	newArr = cals[i].getArrangement(j);
 					//}
@@ -536,4 +552,16 @@ void Schedule::merge(const Schedule* cals, size_t calSize)
 			else book(cals[i].getArrangement(j));
 		}
 	}
+}
+
+std::istream& operator>>(std::istream& in, Schedule& s)
+{
+	s.read(in);
+	return in;
+}
+
+std::ostream& operator<<(std::ostream& out, const Schedule& s)
+{
+	s.write(out);
+	return out;
 }
