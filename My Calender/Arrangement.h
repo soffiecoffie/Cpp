@@ -11,9 +11,10 @@ class Arrangement {
 	MeetingTime time;
 
 public:
-	Arrangement() : name(nullptr), note(nullptr) {}; //shte se izvikat defaultnite na date i meetingtime right?
+	Arrangement() : name(nullptr), note(nullptr) {};
 	Arrangement(const char*, const char*, const Date&, const MeetingTime&);
 	Arrangement(const Date&, const MeetingTime&);
+	Arrangement(bool, const Date&);
 	~Arrangement();
 
 	Date getDay() const { return day; };
@@ -21,7 +22,7 @@ public:
 	char* getName() const { return name; };
 	char* getNote() const { return note; };
 	bool getHoliday() const { return holiday; };
-	size_t getLength();	//TODO
+	size_t getLength() const;
 
 	void setName(const char*);
 	void setNote(const char*);
@@ -31,10 +32,12 @@ public:
 	void setEndTime(const Time&);
 	void print() const;
 
-	Arrangement& operator=(const Arrangement&); //needed?
+	Arrangement& operator=(const Arrangement&); 
 
 	std::istream& read(std::istream&);
 	std::ostream& write(std::ostream&) const;
+	std::istream& readFromBin(std::istream&);
+	std::ostream& writeToBin(std::ostream&) const;
 
 	friend std::istream& operator>>(std::istream&, Arrangement&);
 	friend std::ostream& operator<<(std::ostream&, const Arrangement&);
