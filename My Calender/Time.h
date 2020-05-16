@@ -19,6 +19,7 @@ public:
 
 	bool operator<(const Time&) const;
 	bool operator==(const Time&) const; 
+	Time& operator=(const Time&);
 
 	void print() const;
 
