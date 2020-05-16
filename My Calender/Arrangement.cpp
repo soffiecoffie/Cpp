@@ -1,4 +1,5 @@
 #include <cstring>
+#include <cassert>
 #include <iostream>
 #include <fstream>
 #include "Arrangement.h"
@@ -15,10 +16,26 @@ Arrangement::Arrangement(const Date& d, const MeetingTime& m) : name(nullptr), n
 	day = d;
 }
 
+Arrangement::Arrangement(bool h, const Date& d): holiday(h), day(d), name(nullptr), note(nullptr)
+{
+}
+
 Arrangement::~Arrangement()
 {
 	delete[] this->name;
 	delete[] this->note;
+}
+
+size_t Arrangement::getLength() const
+{
+	if (!getHoliday()) {
+		int hourDifference = getTime().end.getHour() - getTime().start.getHour();
+		int minuteDifference = getTime().end.getMinutes() - getTime().start.getMinutes();
+
+		return hourDifference * 60 + minuteDifference;
+	}
+	
+	return 0;
 }
 
 void Arrangement::setName(const char* _name)
@@ -47,11 +64,13 @@ void Arrangement::setDate(const Date& d)
 
 void Arrangement::setStartTime(const Time& t)
 {
+	assert(t < time.end);
 	time.start = t;
 }
 
 void Arrangement::setEndTime(const Time& t)
 {
+	assert(time.start < t);
 	time.end = t;
 }
 
@@ -100,43 +119,115 @@ Arrangement& Arrangement::operator=(const Arrangement& other)
 
 std::istream& Arrangement::read(std::istream& in)
 {
-	//char* temp = new char[100];
-	//in.getline(temp, 100, '\n');
-	//this->setName(temp);
+	char* temp = new char[1024];
 
-	//delete[] name;//?
-	//delete[] note;//?
+	std::ios::streampos position = in.tellg();
+	in.getline(temp, 1024, '\n');
+	if (strncmp(temp, "(*)", 3) == 0) {
+		holiday = true;
+		in.seekg(0, std::ios::beg);
+		in.seekg(position);
+		in.ignore(4, ' ');
 
-	//TODO make the read and write methods like the print with ignore for the words you dont need using their length
-	this->name = new char[100];
-	in.getline(this->name, 100, '\n');
+		day.read(in);
+	}
+	else {
+//		holiday = false;
+		setHoliday(false);
 
-	this->note = new char[1024];
-	in.getline(this->note, 1024, '\n');
-	//in.getline(this->note, 1024, '\t'); //TODO make it look pretty when the note is long
-	//any text above 60 goes down, if the last character on the line is space do nothing, if it's a letter 
-	//that is the end of a string think of an idea for the space as to not look ugly 
-	//if it ends with a letter that isnt the last add a - and finish the word on the bottom
+		setName(temp);
 
-	this->day.read(in);
+		in.getline(temp, 1024, '\n');
+		setNote(temp);
 
-	this->time.start.read(in);
-	in.ignore(3, ' - ');
-	in >> this->time.end;
+		day.read(in);
+
+		time.start.read(in);
+		in.ignore(3, ' - ');
+		in >> time.end;
+	}
 
 	return in;
 }
 
 std::ostream& Arrangement::write(std::ostream& out) const
 {
-	out << this->name << '\n'
-		<< this->note << '\n';
-	this->day.write(out);
-	out << '\n';
-	this->time.start.write(out);
-	out << " - ";
-	this->time.end.write(out);
+	if (!holiday) {
+		out << this->name << '\n'
+			<< this->note << '\n';
+		this->day.write(out);
+		out << '\n';
+		this->time.start.write(out);
+		out << " - ";
+		this->time.end.write(out);
+	}
+	else {
+		out << "(*) ";
+		this->day.write(out);
+	}
 
+	return out;
+}
+
+std::istream& Arrangement::readFromBin(std::istream& in)
+{
+	int num;
+	char* temp = new char[1024];
+
+	in >> num;
+	in.read(temp, num);
+	temp[num] = '\0';
+
+	//std::cout << temp;
+	if (num == 3 && strcmp(temp, "(*)") == 0) {
+		holiday = true;
+		day.read(in);// FromBin(in);
+		return in;
+	}
+
+	setName(temp);
+	
+	in >> num;
+	in.read(temp, num);
+	temp[num] = '\0';
+	setNote(temp);
+
+	day.read(in);// FromBin(in);
+
+	time.start.read(in);
+
+	time.end.read(in);
+
+	return in;
+}
+
+std::ostream& Arrangement::writeToBin(std::ostream& out) const
+{
+	if (!holiday) {
+		out << strlen(name);
+
+		out.write(name, strlen(name));
+		out << '\n';
+
+		out << strlen(note);
+		out.write(note, strlen(note));
+		out << '\n';
+
+		day.write(out);// ToBin(out);
+		out << '\n';
+
+		time.start.write(out);
+		out << '\n';
+
+		time.end.write(out);
+	}
+	else {
+		out << 3;
+		out.write("(*)", 3);
+		out << '\n';
+
+	}
+	
 	return out;
 }
 
