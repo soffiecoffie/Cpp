@@ -13,16 +13,30 @@ public:
 	Schedule() : arr(nullptr), size(0) {};
 	Schedule(const Arrangement*, size_t); //const?
 
+	size_t getSize() const;
+	Arrangement& getArrangement(size_t) const;
 	int findIndex(const Date&, const Time&);				//find by start time and day!
 	size_t getBusyMinutes(const Date&) const;//TODO
 	bool overlap(const Arrangement&) const;					//checks if new arrangement overlaps others 
 	bool overlapOthers(const Arrangement&, int ind) const;			//checks if existing arrangement overlaps others
+	Arrangement& getOverlappedArr(const Arrangement&) const;
 	void swapArrangements(size_t, size_t);
 	void sortChronologically();
 	bool isHoliday(const Date&) const;
 	bool hasFreeSlot(const Date&, size_t) const; //test this
 	MeetingTime getFreeSlot(const Date& d, size_t hours) const;
+	Schedule allBusyHours(const Schedule*, size_t) const;
+	Schedule& operator=(const Schedule&);
 	void print() const;
+
+
+	std::istream& read(std::istream&);
+	std::ostream& write(std::ostream&) const;
+	std::istream& readFromBin(std::istream&);
+	std::ostream& writeToBin(std::ostream&) const;
+
+	friend std::istream& operator>>(std::istream&, Schedule&);
+	friend std::ostream& operator<<(std::ostream&, const Schedule&);
 
 	void book(const Arrangement&);
 	void unbook(const Date&, MeetingTime);
@@ -36,7 +50,7 @@ public:
 	Date findslot(const Date&, size_t) const;
 	Date findslotwith(const Date&, size_t, const Schedule*, size_t) const; //const schedule?
 	Date findslotwithOneCal(const Date&, size_t, const Schedule&) const; 
-	void merge(const Schedule*);
+	void merge(const Schedule*, size_t);
 };
 
 
