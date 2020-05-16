@@ -58,6 +58,15 @@ bool Time::operator==(const Time& other) const
 	return hour == other.hour && minutes == other.minutes;
 }
 
+Time& Time::operator=(const Time& other) 
+{
+	if (this != &other) {
+		setHour(other.getHour());
+		setMinutes(other.getMinutes());
+	}
+	return *this;
+}
+
 //принтира времето на екрана
 void Time::print() const
 {
