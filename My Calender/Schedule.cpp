@@ -59,6 +59,16 @@ Schedule::Schedule(const Arrangement* _arr, size_t _size): size(_size), arr(new 
 	}
 }
 
+size_t Schedule::getSize() const
+{
+	return size;
+}
+
+Arrangement Schedule::getArrangement(size_t ind) const
+{
+	return arr[ind];
+}
+
 int Schedule::findIndex(const Date& d, const Time& start)
 {
 	for (size_t i = 0; i < size; ++i)
@@ -99,6 +109,20 @@ bool Schedule::overlapOthers(const Arrangement& other, int ind) const
 	}
 
 	return false;
+}
+
+Arrangement Schedule::getOverlappedArr(const Arrangement& other) const
+{
+	assert(overlap(other));
+	for (size_t i = 0; i < size; ++i)
+	{
+		if ((arr[i].getDay() == other.getDay()) && (arr[i].getTime().start == other.getTime().start
+			|| (arr[i].getTime().start < other.getTime().end && other.getTime().start < arr[i].getTime().start)
+			|| (other.getTime().start < arr[i].getTime().end && arr[i].getTime().start < other.getTime().start)))
+		{
+			return arr[i];
+		}
+	}
 }
 
 void Schedule::swapArrangements(size_t i, size_t j)
@@ -178,8 +202,41 @@ MeetingTime Schedule::getFreeSlot(const Date& d, size_t hours) const
 	return MeetingTime(Time(0, 0), Time(0, 0));
 }
 
+Schedule Schedule::allBusyHours(const Schedule* cal, size_t calSize) const
+{
+	size_t resultSize = 0;
+	for (size_t i = 0; i < calSize; ++i)
+	{
+		resultSize += cal[i].getSize();
+	}
 
 
+	Arrangement* arrs = new Arrangement[resultSize];
+	size_t spot = 0;
+	for (size_t i = 0; i < calSize; ++i)
+	{
+		for (size_t j = 0; j < cal[i].getSize(); ++j)
+		{
+			arrs[spot] = cal[i].getArrangement(j);
+		}
+
+	}
+	return Schedule (arrs, resultSize);
+}
+
+Schedule& Schedule::operator=(const Schedule& other)
+{
+	if (this != &other) {
+		size = other.getSize();
+		delete[] arr;
+		arr = new Arrangement[size];
+		for (size_t i = 0; i < size; ++i)
+		{
+			arr[i] = other.getArrangement(i);
+		}
+	}
+	return *this;
+}
 
 void Schedule::print() const
 {
@@ -383,15 +440,20 @@ Date Schedule::findslot(const Date& from, size_t hours) const
 
 Date Schedule::findslotwith(const Date& from, size_t hours, const Schedule* calendars, size_t sizeCalendars) const
 {
-	//TODO
-	//Date d, temp;
-	//temp = from;
-	//do {
-	//	d = findslot(temp, hours);
-	//	
-	//} while (true);
+	Schedule* allCals = new Schedule[sizeCalendars + 1];
+	for (size_t i = 0; i < sizeCalendars ; ++i)
+	{
+		allCals[i] = calendars[i];
+	}
+	allCals[sizeCalendars] = *this;
+
+	Schedule busyHours;
+	busyHours = allBusyHours(allCals, sizeCalendars + 1);
+
+	return busyHours.findslot(from, hours);
 }
 
+//remove?
 Date Schedule::findslotwithOneCal(const Date& from, size_t hours, const Schedule& cal) const
 {
 	Date d, temp;
@@ -408,7 +470,70 @@ Date Schedule::findslotwithOneCal(const Date& from, size_t hours, const Schedule
 		}
 	} while (true);
 }
-		//for (size_t i = 0; i < sizeCalendars; ++i)
-		//{
-		//	
-		//}
+
+void Schedule::merge(const Schedule* cals, size_t calSize)
+{
+	
+	for (size_t i = 0; i < calSize; ++i)
+	{
+		for (size_t j = 0; j < cals[i].getSize(); ++j)
+		{
+			//only works if 2 arrangements at most overlap
+			if (overlap(cals[i].getArrangement(j))) {
+				Arrangement newArr;
+				bool okay = true;
+				newArr = cals[i].getArrangement(j);
+				do {
+					std::cout << "These arrangements overlap: \n\n Arrangement 1\n";
+					//cals[i].getArrangement(j).print();
+					newArr.print();
+					
+					std::cout << "\n\nArrangement 2\n";
+					//temp = getOverlappedArr(cals[i].getArrangement(j));
+					size_t ind = findIndex(getOverlappedArr(cals[i].getArrangement(j)).getDay(),
+						getOverlappedArr(cals[i].getArrangement(j)).getTime().start);
+					arr[ind].print();
+
+					int num;
+					do {
+						std::cout << "\nEnter the number of the arrangement you would like to move: \n";
+						std::cin >> num;
+					} while (num != 1 && num != 2);
+
+					Date newDate;
+					std::cout << "Enter your preffered day for the arrangement: \n";
+					std::cin >> newDate;
+
+					Time newStart;
+					std::cout << "Enter your preffered start time for the arrangement: \n";
+					std::cin >> newStart;
+
+					Time newEnd;
+					std::cout << "Enter your preffered end time for the arrangement: \n";
+					std::cin >> newEnd;
+
+					Arrangement newArr;
+					//if (num == 1) {
+					//	newArr = cals[i].getArrangement(j);
+					//}
+					//else {
+					if(num==2){
+						newArr = arr[ind]; //temp;
+						unbook(arr[ind].getDay(), arr[ind].getTime());
+						book(cals[i].getArrangement(j));
+					}
+					newArr.setDate(newDate);
+					newArr.setStartTime(newStart);
+					newArr.setEndTime(newEnd);
+
+					if (overlap(newArr)) {
+						okay = false;
+					}
+					else okay = true;
+
+				} while (!okay);
+			}
+			else book(cals[i].getArrangement(j));
+		}
+	}
+}
