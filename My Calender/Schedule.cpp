@@ -1,5 +1,7 @@
 #include "Schedule.h"
+#include "CmdValidator.h"
 #include <iostream>
+#include <string>
 #include <cassert>
 #include <vector>
 
@@ -51,12 +53,27 @@ bool Schedule::hasStr(const char* original, const char* str) const
 	return false;
 }
 
+void Schedule::del()
+{
+	delete[] arr;
+}
+
 Schedule::Schedule(const Arrangement* _arr, size_t _size): size(_size), arr(new Arrangement[size])
 {
 	for (size_t i = 0; i < size; ++i)
 	{
 		arr[i] = _arr[i];
 	}
+}
+
+Schedule::~Schedule()
+{
+	del();
+}
+
+void Schedule::setUserFile(std::string str)
+{
+	userFile = str;
 }
 
 size_t Schedule::getSize() const
@@ -265,6 +282,84 @@ std::ostream& Schedule::write(std::ostream& out) const
 	return out;
 }
 
+void Schedule::open(std::string input)
+{
+	input.erase(0, CmdValidator::getFirstSpaceInd(input) + 1);
+	
+	std::ifstream in(input, std::ios::in);
+	if (!in) {
+		//creates a file and if it doesnt get saved it stays empty
+		std::ofstream out(input);
+		if (!out) {
+			std::cout << "Can't open file " << input << " try again\n"; 
+		}
+		//fills the file with the basic calendar.txt
+		write(out);				 //yay or nay? 
+		setUserFile(input);		 //creates a new file if it gets saved, update - not anymore
+	}
+	else {
+		read(in);
+
+		setUserFile(input);
+
+		isOpen = 1;
+	}
+	std::cout << "Successfully opened file " << input << std::endl;
+}
+
+void Schedule::close()
+{
+	del();
+	isDone = 0;
+	size = 0;
+	isOpen = 0;
+	std::cout << "No changes were made to your calendar.\n";
+	std::cout << "Successfully closed file " << userFile << std::endl;
+}
+
+void Schedule::save()
+{
+	std::ofstream out(userFile);
+	if (!out) {
+		std::cout << "Can't open file " << userFile << std::endl;
+	}
+	else {
+		write(out);
+		std::cout << "Successfully saved " << userFile << std::endl;
+	}
+}
+
+void Schedule::saveas(std::string input)
+{
+	input.erase(0, CmdValidator::getFirstSpaceInd(input) + 1);
+
+	std::ofstream out(input);
+	if (!out) {
+		std::cout << "Can't save file as" << input << std::endl;
+	}
+	else {
+		write(out);
+
+		std::cout << "Successfully saved " << input << std::endl;
+	}
+}
+
+void Schedule::exit()
+{
+	std::cout << "Exiting the program...";
+	isDone = 1;
+}
+
+bool Schedule::getIsDone() const
+{
+	return isDone;
+}
+
+bool Schedule::getIsOpen() const
+{
+	return isOpen;
+}
+
 void Schedule::book(const Arrangement& other)
 {
 	if (!this->overlap(other)) { 
@@ -274,7 +369,7 @@ void Schedule::book(const Arrangement& other)
 	else std::cout << "Times overlap! Can't book.\n";
 }
 
-void Schedule::unbook(const Date& date, MeetingTime time)
+void Schedule::unbook(const Date& date, const MeetingTime& time)
 {
 	for (size_t i = 0; i < size; ++i)
 	{
@@ -297,12 +392,16 @@ void Schedule::unbook(const Date& date, MeetingTime time)
 			{
 				arr[i] = temp[i];
 			}
+
+			std::cout << "Successfully unbooked an appointment!\n";
 			return;
 		}
 	}
+	std::cout << "Unbooking was unsuccessful! \nThere isn't an existing appointment on " << date
+		<< " from " << time.start << " to " << time.end << std::endl;
 }
 
-void Schedule::agenda(const Date& date) 
+void Schedule::agenda(const Date& date)
 {
 	bool empty = 1;
 	std::cout << "Agenda for the day " << date << ":\n\n";
@@ -324,54 +423,54 @@ void Schedule::agenda(const Date& date)
 	}
 }
 
-void Schedule::change(const Date& d, const Time& start, const char* option, const Date& newDate)
-{
-	assert(strcmp(option, "date") == 0);
-	int ind = findIndex(d, start);
-	if (ind == -1) {
-		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
-		return;
-	}
-
-	arr[ind].setDate(newDate);
-}
-
-void Schedule::change(const Date& d, const Time& start, const char* option, const Time& newTime)
-{
-	assert(strcmp(option, "starttime") == 0 || strcmp(option, "endtime") == 0);
-
-	int ind = findIndex(d, start);
-	if (ind == -1) {
-		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
-		return;
-	}
-
-	if (strcmp(option, "starttime") == 0) {
-		if (newTime < arr[ind].getTime().end && !(overlapOthers(Arrangement(d, MeetingTime(newTime, arr[ind].getTime().end)), ind)))
-			arr[ind].setStartTime(newTime);
-		else std::cout << "The arrangement on " << d << " at " << start << " can't start at " << newTime << "!\n\n";
-	}
-	else if (arr[ind].getTime().start < newTime && !(overlapOthers(Arrangement(d, MeetingTime(arr[ind].getTime().start, newTime)), ind)))
-		arr[ind].setEndTime(newTime);
-	else std::cout << "The arrangement on " << d << " at " << start << " can't end at " << newTime << "!\n\n";
-
-}
-
-void Schedule::change(const Date& d, const Time& start, const char* option, const char* str)
-{
-	assert(strcmp(option, "note") == 0 || strcmp(option, "name") == 0);
-
-	int ind = findIndex(d, start);
-	if (ind == -1) {
-		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
-		return;
-	}
-
-	if (strcmp(option, "note") == 0) {
-		arr[ind].setNote(str);
-	}
-	else arr[ind].setName(str);
-}
+//void Schedule::change(const Date& d, const Time& start, const char* option, const Date& newDate)
+//{
+//	assert(strcmp(option, "date") == 0);
+//	int ind = findIndex(d, start);
+//	if (ind == -1) {
+//		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
+//		return;
+//	}
+//
+//	arr[ind].setDate(newDate);
+//}
+//
+//void Schedule::change(const Date& d, const Time& start, const char* option, const Time& newTime)
+//{
+//	assert(strcmp(option, "starttime") == 0 || strcmp(option, "endtime") == 0);
+//
+//	int ind = findIndex(d, start);
+//	if (ind == -1) {
+//		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
+//		return;
+//	}
+//
+//	if (strcmp(option, "starttime") == 0) {
+//		if (newTime < arr[ind].getTime().end && !(overlapOthers(Arrangement(d, MeetingTime(newTime, arr[ind].getTime().end)), ind)))
+//			arr[ind].setStartTime(newTime);
+//		else std::cout << "The arrangement on " << d << " at " << start << " can't start at " << newTime << "!\n\n";
+//	}
+//	else if (arr[ind].getTime().start < newTime && !(overlapOthers(Arrangement(d, MeetingTime(arr[ind].getTime().start, newTime)), ind)))
+//		arr[ind].setEndTime(newTime);
+//	else std::cout << "The arrangement on " << d << " at " << start << " can't end at " << newTime << "!\n\n";
+//
+//}
+//
+//void Schedule::change(const Date& d, const Time& start, const char* option, const char* str)
+//{
+//	assert(strcmp(option, "note") == 0 || strcmp(option, "name") == 0);
+//
+//	int ind = findIndex(d, start);
+//	if (ind == -1) {
+//		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
+//		return;
+//	}
+//
+//	if (strcmp(option, "note") == 0) {
+//		arr[ind].setNote(str);
+//	}
+//	else arr[ind].setName(str);
+//}
 
 void Schedule::find(const char* str) const
 {
