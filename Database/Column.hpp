@@ -1,31 +1,28 @@
-﻿#include "Column.h"
 #include <iomanip>
 #include <iostream>
+#include <cassert>
+#include "Column.h"
 
 template<typename T>
-Column<T>::Column(const char* _title, const T* _cells, size_t _size) : size(_size), cells(new T[_size])
+Column<T>::Column(const std::string& _title, const std::string& _type, const T* _cells, size_t _size) : size(_size), cells(new T[_size])
 {
 	title = _title;
-
+	type = _type;
+	
 	for (size_t i = 0; i < size; ++i)
 	{
 		cells[i] = _cells[i];
 	}
 }
 
-//template<typename T>
-//Column<T>::Column(const std::string& _title, const T* _cells, size_t _size) : size(_size), cells(new T[_size])
-//{
-//	title = _title;
-//
-//	for (size_t i = 0; i < size; ++i)
-//	{
-//		cells[i] = _cells[i];
-//	}
-//}
+template<typename T>
+Column<T>::Column(const char* type): size(0), title(""), cells(nullptr)
+{
+	setType(type);
+}
 
 template<typename T>
-Column<T>::Column() : size(0), title(""), cells(nullptr)
+Column<T>::Column() : size(0), title(""), type(""), cells(nullptr)
 {
 }
 
@@ -35,59 +32,103 @@ Column<T>::~Column()
 	delete[] cells;
 }
 
+//връща броя на цифрите в клетката
 template<typename T>
-inline void Column<T>::printCellLine() const
+size_t Column<T>::getCellLength(size_t ind) const
 {
-	size_t length = getLongest() + 6;
-	std::cout << "+";
-	printMany("-", length);
+	if (cells[ind] == NULL) return 4;
+	return digits(cells[ind]);
+}
+
+//връща броя на символите в клетката
+template<>
+inline size_t Column<std::string>::getCellLength(size_t ind) const
+{
+	return cells[ind].size();
 }
 
 template<typename T>
-inline void Column<T>::printCellTitle() const
+std::ostream& Column<T>::printCellLine(std::ostream& out) const
+{
+	size_t length = getLongest() + 6;
+	out << "+";
+	printMany("-", length, out);
+	return out;
+}
+
+template<typename T>
+std::ostream& Column<T>::printCellTitle(std::ostream& out) const
 {
 	size_t length = getLongest() + 6;
 	size_t pad = length - title.size();
-	std::cout << "|";
+	out << "|";
 
-	printPadding(title.size(), pad);
+	printPadding(title.size(), pad, out);
 
-	std::cout << title;
+	out << title;
 
-	printPadding(title.size(), pad);
+	printPadding(title.size(), pad, out);
+	return out;
 }
 
 template<typename T>
-void Column<T>::printCellInsides(size_t i) const
+std::ostream& Column<T>::printCellInsides(size_t i, std::ostream& out) const 
+{
+	size_t length = getLongest() + 6; //to do longest with null
+
+	if (cells[i] == NULL) {
+		size_t pad = length - 4;
+		out << "|";
+
+		printPadding(4, pad, out);
+
+		out << "NULL";
+
+		if (isOdd(pad))pad = pad - 1;
+		printPadding(4, pad, out);
+	}
+	else {
+		size_t pad = length - getCellLength(i);
+
+		out << "|";
+
+		printPadding(getCellLength(i), pad, out);
+
+		out << cells[i];
+
+		if (isOdd(pad))pad = pad - 1;
+		printPadding(getCellLength(i), pad, out);
+	}
+
+	return out;
+}
+
+template<>
+inline std::ostream& Column<std::string>::printCellInsides(size_t i, std::ostream & out) const
 {
 	size_t length = getLongest() + 6;
 	size_t pad = length - getCellLength(i);
 
-	std::cout << "|";
+	out << "|";
 
-	printPadding(getCellLength(i), pad);
-	
-	std::cout << cells[i];
+	printPadding(getCellLength(i), pad, out);
+
+	out << cells[i];
 
 	if (isOdd(pad))pad = pad - 1;
-	printPadding(getCellLength(i), pad);
+	printPadding(getCellLength(i), pad, out);
+
+	return out;
 }
 
 template<typename T>
-void Column<T>::printCell() const
-{
-	size_t length = getLongest() + 6;
-	std::cout << "\n";
-	print();
-}
-
-template<typename T>
-void Column<T>::printPadding(size_t length, size_t pad) const
+std::ostream& Column<T>::printPadding(size_t length, size_t pad, std::ostream& out) const
 {
 	if (isOdd(length)) {
-		printMany(" ", (pad + 1) / 2);
+		printMany(" ", (pad + 1) / 2, out);
 	}
-	else printMany(" ", pad / 2);
+	else printMany(" ", pad / 2, out);
+	return out;
 }
 
 template<typename T>
@@ -96,61 +137,33 @@ size_t Column<T>::getColSize() const
 	return size;
 }
 
-
-//template<typename T>
-//void Column<T>::setNullCell(size_t ind)
-//{
-//	cells[ind] = NULL;
-//}
-
-//template<typename U>
-//void printCentered(const U)
-//{
-//}
-//
-//template<>
-//void printCentered(const char*)
-//{
-//}
-
-//template<typename T>
-//void Column<T>::printCentered(T ch) const
-//{
-//	int pad = length - 3 - getCellLength(i);
-//
-//	std::cout << "\n|";
-//	printMany(" ", pad);
-//
-//	std::cout << ch;
-//
-//	if (isOdd(pad)) {
-//		printMany(" ", pad - 1);
-//	}
-//	else printMany(" ", pad);
-//
-//	std::cout << "|\n";
-//}
-//
-//template<typename T>
-//void Column<T>::printCentered(const std::string& ch) const
-//{
-//	int pad = length - 3 - ch.size();
-//
-//	std::cout << "\n|";
-//	printMany(" ", pad);
-//
-//	std::cout << ch;
-//
-//	if (isOdd(pad)) {
-//		printMany(" ", pad - 1);
-//	}
-//	else printMany(" ", pad);
-//
-//	std::cout << "|\n";
-//}
+template<typename T>
+inline std::string Column<T>::getType() const
+{
+	return type;
+}
 
 template<typename T>
-inline void Column<T>::addCell(T cell)
+inline std::string Column<T>::getTitle() const
+{
+	return title;
+}
+
+template<typename T>
+std::string Column<T>::getCellAt(size_t ind) const
+{
+	if (cells[ind] == NULL) return "NULL";
+	return std::to_string(cells[ind]);
+}
+
+template<>
+inline std::string Column<std::string>::getCellAt(size_t ind) const
+{
+	return cells[ind];
+}
+
+template<typename T>
+void Column<T>::addCell(std::string cell)
 {
 	T* temp = new T[size];
 	for (size_t i = 0; i < size; ++i)
@@ -162,29 +175,117 @@ inline void Column<T>::addCell(T cell)
 	cells = new T[++size];
 	for (size_t i = 0; i < size - 1; ++i)
 	{
-		temp[i] = cells[i];
+		cells[i] = temp[i];
 	}
 	cells[size - 1] = cell;
 }
 
+template<>
+inline void Column<int>::addCell(std::string cell)
+{
+	int* temp = new int[size];
+	for (size_t i = 0; i < size; ++i)
+	{
+		temp[i] = cells[i];
+	}
+	delete[] cells;
+
+	cells = new int[++size];
+	for (size_t i = 0; i < size - 1; ++i)
+	{
+		cells[i] = temp[i];
+	}
+	cells[size - 1] = std::stoi(cell);
+}
+
+template<>
+inline void Column<double>::addCell(std::string cell)
+{
+	double* temp = new double[size];
+	for (size_t i = 0; i < size; ++i)
+	{
+		temp[i] = cells[i];
+	}
+	delete[] cells;
+
+	cells = new double[++size];
+	for (size_t i = 0; i < size - 1; ++i)
+	{
+		cells[i] = temp[i];
+	}
+	cells[size - 1] = std::stod(cell);
+}
+//template<typename T>
+//void Column<T>::addCell(std::string cell)
+//{
+//	if (type == "string") {
+//
+//		T* temp = new T[size];
+//		for (size_t i = 0; i < size; ++i)
+//		{
+//			temp[i] = cells[i];
+//		}
+//		delete[] cells;
+//
+//		cells = new T[++size];
+//		for (size_t i = 0; i < size - 1; ++i)
+//		{
+//			cells[i] = temp[i];
+//		}
+//		cells[size - 1] = cell;
+//	}
+//	if (type == "double") {
+//		T* temp = new T[size];
+//		for (size_t i = 0; i < size; ++i)
+//		{
+//			temp[i] = cells[i];
+//		}
+//		delete[] cells;
+//
+//		cells = new T[++size];
+//		for (size_t i = 0; i < size - 1; ++i)
+//		{
+//			cells[i] = temp[i];
+//		}
+//		cells[size - 1] = std::stod(cell);
+//	}
+//	if (type == "int") {
+//		T* temp = new T[size];
+//		for (size_t i = 0; i < size; ++i)
+//		{
+//			temp[i] = cells[i];
+//		}
+//		delete[] cells;
+//
+//		cells = new T[++size];
+//		for (size_t i = 0; i < size - 1; ++i)
+//		{
+//			cells[i] = temp[i];
+//		}
+//		cells[size - 1] = std::stoi(cell);
+//	}
+//
+//
+//}
+
+
+//template<typename T>
+//void Column<T>::setNullCell(size_t ind)
+//{
+//	cells[ind] = NULL;
+//}
+
 template<typename T>
-inline void Column<T>::setTitle(const char* t)
+void Column<T>::setTitle(std::string t)
 {
 	title = t;
 }
 
-//връща броя на цифрите в клетката
 template<typename T>
-size_t Column<T>::getCellLength(size_t ind) const
+void Column<T>::setType(const char* t)
 {
-	return digits(cells[ind]);
-}
-
-//връща броя на символите в клетката
-template<>
-size_t Column<std::string>::getCellLength(size_t ind) const
-{
-	return cells[ind].size();
+	assert(strcmp(t, "int") || strcmp(t, "string") || strcmp(t, "double"));
+	type = t;
 }
 
 //връща дължината на най-дългата клетка
@@ -204,99 +305,65 @@ size_t Column<T>::getLongest() const
 	return getCellLength(max);
 }
 
-//извежда на екрана даден символ по даден брой пъти един след друг
 template<typename T>
-void Column<T>::printMany(const char* ch, size_t n) const
+void Column<T>::printCell(size_t ind) const
 {
-	for (size_t i = 0; i < n; ++i)
-	{
-		std::cout << ch;
-	}
-}
-
-template<typename T>
-void Column<T>::printCellContents(size_t length) const
-{
-	int pad;
-
-	for (size_t i = 0; i < size; ++i)
-	{
-		pad = length - getCellLength(i);
-
-		std::cout << "\n|";
-		if (isOdd(getCellLength(i))) {
-			printMany(" ", (pad + 1) / 2);
-		}
-		else printMany(" ", pad / 2);
-
-		std::cout << cells[i];
-
-		if (isOdd(getCellLength(i))) {
-			printMany(" ", (pad+1)/2-1);
-		}
-		else printMany(" ", pad/2);
-
-		std::cout << "|\n";
-		
-		std::cout << "+";
-		printMany("-", length);
-		std::cout << "+";
-
-		//std::cout << "|";
-		//printMany("-", length );
-		//std::cout << "|";
-
-	}
+	std::cout << cells[ind];
 }
 
 template<typename T>
 void Column<T>::print() const
 {
-	int length = getLongest();
-	length += 6; //по 3 " " минимум от всяка страна
-	//printMany("-", length + 2);
-	std::cout << "+";
-	printMany("-", length);
-	std::cout << "+";
-
-
-	int pad = length - title.size();
-	std::cout << "\n|";
-
-	if (isOdd(title.size())) {
-		printMany(" ", (pad + 1) / 2);
-	}
-	else printMany(" ", pad / 2);
-
-	std::cout << title;
-
-	if (isOdd(title.size())) {
-		printMany(" ", (pad + 1) / 2 - 1);
-	}
-	else printMany(" ", pad / 2);
-
+	printCellLine(std::cout);
+	std::cout << "+\n";
+	printCellTitle(std::cout);
 	std::cout << "|\n";
 
+	printCellLine(std::cout);
+	for (size_t i = 0; i < size; ++i)
+	{
+		std::cout << "+\n";
+		printCellInsides(i, std::cout);
+		std::cout << "|\n";
+		printCellLine(std::cout);
+	}
 	std::cout << "+";
-	printMany("-", length);
-	std::cout << "+";
-	
-	//std::cout << "|";
-	//printMany("-", length);
-	//std::cout << "|";
-	
-	//printMany("-", length+2);
-
-	printCellContents(length);
+	std::cout << "\n";
 }
 
-int digits(int n)
+//извежда на екрана даден символ по даден брой пъти един след друг
+template<typename T>
+std::ostream& Column<T>::printMany(const char* ch, size_t n, std::ostream& out) const
+{
+	for (size_t i = 0; i < n; ++i)
+	{
+		out << ch;
+	}
+	return out;
+}
+
+template<typename T>
+int Column<T>::digits(int n) const
 {
 	if (n == 0)	return 0;
 	return 1 + digits(n / 10);
 }
 
-bool isOdd(int n)
+template<typename T>
+bool Column<T>::isOdd(int n) const
 {
 	return n % 2 != 0;
+}
+
+template<typename T>
+void Column<T>::setNullCellAt(size_t ind)
+{
+	cells[ind] = NULL;
+}
+
+template<>
+inline void Column<std::string>::setNullCellAt(size_t ind)
+{
+	assert(ind < size);
+	cells[ind] = "NULL";
 }
