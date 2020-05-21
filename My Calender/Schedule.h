@@ -1,17 +1,29 @@
-#ifndef SCHEDULE_H
-#define SCEDULE_H
-#include "Arrangement.h"
+#ifndef SCHEDULE__H
+#define SChEDULE__H
 
-class Schedule {
+//#include "Arrangement.h"
+#include "ISchedule.h"
+#include <string>
+
+class Schedule : public ISchedule {
 	size_t size;
 	Arrangement* arr;
+	std::string userFile = "";
 
 	void addSize(size_t);
 	bool hasStr(const char*, const char*) const; //checks if a given string can be found in another
-		//TODO change hasStr so that i can arr.hasStr(str) 
+												//TODO change hasStr so that i can arr.hasStr(str) 
+
+	bool isDone = 0;
+	bool isOpen = 0;
+	void del();
+
 public:
 	Schedule() : arr(nullptr), size(0) {};
 	Schedule(const Arrangement*, size_t); //const?
+	~Schedule();
+
+	void setUserFile(std::string);
 
 	size_t getSize() const;
 	Arrangement& getArrangement(size_t) const;
@@ -38,12 +50,26 @@ public:
 	friend std::istream& operator>>(std::istream&, Schedule&);
 	friend std::ostream& operator<<(std::ostream&, const Schedule&);
 
+	void open(std::string);
+	void close();
+	void save();
+	void saveas(std::string);
+//	void help();
+	void exit();
+
+	bool getIsDone() const;
+	bool getIsOpen() const;
+
+	//void book(std::string);//remove
+	//void unbook();//remove
 	void book(const Arrangement&);
-	void unbook(const Date&, MeetingTime);
+	void unbook(const Date&, const MeetingTime&);
 	void agenda(const Date& date);
-	void change(const Date&, const Time&, const char*, const Date&);	//promenq denq
-	void change(const Date&, const Time&, const char*, const Time&);	//start/endtime
-	void change(const Date&, const Time&, const char*, const char*);	//note/name
+	//template<typename T>
+	//void change(const Date&, const Time&, const char*, T);
+	//void change(const Date&, const Time&, const char*, const Date&);	//promenq denq
+	//void change(const Date&, const Time&, const char*, const Time&);	//start/endtime
+	//void change(const Date&, const Time&, const char*, const char*);	//note/name
 	void find(const char*) const;
 	void holiday(const Date&);
 	void busydays(const Date&, const Date&) const;
@@ -53,5 +79,6 @@ public:
 	void merge(const Schedule*, size_t);
 };
 
+#include "Schedule.hpp"
 
 #endif 
