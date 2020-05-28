@@ -1,81 +1,36 @@
 #include "Table.h"
+#include "Utils.h"
 #include <iostream>
 #include <cassert>
 
+//изтрива динамичната памет
+void Table::del()
+{
+	for (size_t i = 0; i < size; ++i)
+	{
+		delete cols[i];
+	}
+	delete[] cols;
+}
 
+//конструктор по подразбиране
 Table::Table(): cols(nullptr), size(0), name("")
 {
 }
 
-Table::Table(IColumn* arr[], size_t s, const std::string& n) : size(s), name(n)
+//конструктор с параметри
+Table::Table(IColumn** arr, size_t s, const std::string& n) : name(n), cols(nullptr), size(0)
 {
-	cols = new IColumn*[s];
-	for (size_t i = 0; i < size; ++i)
-	{
-		cols[i] = arr[i];
-	}
+	setCol(arr, s);
 }
 
+//деструктор
 Table::~Table()
 {
-	//for (size_t i = 0; i < size; ++i)
-	//{
-	//	delete cols[i];
-	//}
-	delete[] cols;
+	del();
 }
 
-//void Table::print() const
-//{
-//	printTableLine();
-//
-//	printTableTitles();
-//
-//	printTableRow();
-//
-//	printTableLine();
-//}
-//
-//void Table::printTableLine() const
-//{
-//	for (size_t i = 0; i < size; ++i)
-//	{
-//		cols[i]->printCellLine();
-//	}
-//	std::cout << "+\n";
-//}
-//
-//void Table::printTableTitles() const
-//{
-//	for (size_t i = 0; i < size; ++i)
-//	{
-//		cols[i]->printCellTitle();
-//	}
-//	std::cout << "|\n";
-//}
-//
-//void Table::printTableRow() const
-//{
-//	size_t max = 0;
-//	for (size_t i = 0; i < size; ++i)
-//	{
-//		if (max < cols[i]->getColSize()) max = cols[i]->getColSize();
-//	}
-//	size_t colSize = max;
-//
-//	//if one col is shorter then make cells say NULL		TODO
-//	for (size_t i = 0; i < max; ++i)
-//	{
-//		printTableLine();
-//		for (size_t j = 0; j < size; ++j)
-//		{
-//			cols[j]->printCellInsides(i);
-//		}
-//		std::cout << "|\n";
-//	}
-//}
-//
-
+//принтира таблицата
 std::ostream& Table::print(std::ostream& out) const
 {
 	printTableLine(out);
@@ -89,6 +44,7 @@ std::ostream& Table::print(std::ostream& out) const
 	return out;
 }
 
+//принтира линията на таблицата
 std::ostream& Table::printTableLine(std::ostream& out) const
 {
 	for (size_t i = 0; i < size; ++i)
@@ -99,6 +55,7 @@ std::ostream& Table::printTableLine(std::ostream& out) const
 	return out;
 }
 
+//принтира заглавията
 std::ostream& Table::printTableTitles(std::ostream& out) const
 {
 	for (size_t i = 0; i < size; ++i)
@@ -110,17 +67,18 @@ std::ostream& Table::printTableTitles(std::ostream& out) const
 	return out;
 }
 
+//принтира редовете
 std::ostream& Table::printTableRow(std::ostream& out) const
 {
 	size_t max = getMaxColSize();
 
-	//if one col is shorter then make cells say NULL		TODO
 	for (size_t i = 0; i < max; ++i)
 	{
 		printTableLine(out);
 		for (size_t j = 0; j < size; ++j)
 		{
-			cols[j]->printCellInsides(i, out);
+			if (cols[j]->getColSize() < i + 1)	cols[j]->printCellContents(-1, out);
+			else cols[j]->printCellContents(i, out);
 		}
 		out << "|\n";
 	}
@@ -183,6 +141,7 @@ std::istream& Table::read(std::istream& in)
 		in.ignore(2, '\n');
 	}
 
+	delete[] temp;
 	return in;
 }
 
@@ -259,16 +218,36 @@ std::string Table::removePaddingFromStr(std::string s)
 	return result;
 }
 
-//проверява дали празното място на подадения индекс в дадения низ се намира между думи
-bool Table::isSpaceBetweenWords(std::string str, size_t ind)
+//задава стойности на колоните
+void Table::setCol(IColumn* arr[], size_t s)
 {
-	assert(str[ind] == ' ');
-	if (ind != str.size() - 1 && ind != 0) {
-		return (str[ind - 1] != ' ') && (str[ind + 1] != ' ');
+	for (size_t i = 0; i < size; ++i)
+	{
+		delete cols[i];
 	}
-	return false; //ако е първия или последния символ 
+	delete[] cols;
+
+	size = s;
+	cols = new IColumn * [s];
+
+	for (size_t i = 0; i < size; ++i)
+	{
+		int j = 0;
+		if (arr[i]->getType() == "string") {
+			cols[i] = new Column<std::string>;
+		}
+		else if (arr[i]->getType() == "double") {
+			cols[i] = new Column<double>;
+		}
+		else {
+			cols[i] = new Column<int>;
+		}
+		cols[i] = arr[i];
+	}
+
 }
 
+//връща големината на най-голямата колона 
 size_t Table::getMaxColSize() const
 {
 	size_t max = 0;
