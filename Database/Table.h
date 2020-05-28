@@ -11,9 +11,12 @@ class Table
 	IColumn** cols;
 	std::string name;
 
+private:
+	void del();
+
 public:
 	Table();
-	Table(IColumn* [], size_t s, const std::string&);
+	Table(IColumn**, size_t, const std::string&);
 	~Table();
 
 	std::ostream& print(std::ostream& out) const;
@@ -25,7 +28,8 @@ public:
 	std::ostream& write(std::ostream&) const;
 	
 	std::string removePaddingFromStr(std::string s);
-	bool isSpaceBetweenWords(std::string str, size_t ind);
+
+	void setCol(IColumn* [], size_t);
 
 	size_t getMaxColSize() const;
 
