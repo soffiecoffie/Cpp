@@ -1,7 +1,10 @@
-#ifndef DATE_H
+﻿#ifndef DATE_H
 #define DATE_H
 #include <fstream>
+#include <string>
 
+
+/** @brief клас Date създава дата*/
 class Date {
 private:
 	int year;
@@ -23,9 +26,14 @@ public:
 	void print() const;
 	bool operator<(const Date&) const;
 	bool operator==(const Date&) const;
+	bool operator<=(const Date&) const;
 
 	bool isLeap() const;
 	int maxDays() const;
+
+	Date getNextDay() const;
+
+	Date stringToDate(std::string);
 
 	std::istream& read(std::istream&);
 	std::ostream& write(std::ostream&) const;

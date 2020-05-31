@@ -1,9 +1,10 @@
-#ifndef ICOMMAND_H
+﻿#ifndef ICOMMAND_H
 #define ICOMMAND_H
 
 #include <string>
 #include "ISchedule.h"
 
+/** @brief клас ICommand е интерфейсен клас на всички команди*/
 class ICommand
 {
 protected:

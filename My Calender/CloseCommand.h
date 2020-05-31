@@ -1,8 +1,9 @@
-#ifndef CLOSECOMMAND_H
+﻿#ifndef CLOSECOMMAND_H
 #define CLOSECOMMAND_H
 
 #include "ICommand.h"
 
+/** @brief клас CloseCommand помага за извикването на командата close от потребителя*/
 class CloseCommand : public ICommand
 {
 	size_t numOfWords = 1;

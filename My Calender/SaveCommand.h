@@ -1,8 +1,9 @@
-#ifndef SAVECOMMAND_H
-#define SAVECOMMAND_H
+﻿#ifndef SAVECOMMAND__H
+#define SAVECOMMAND__H
 
 #include "ICommand.h"
 
+/** @brief клас SaveCommand помага за извикването на командата save от потребителя*/
 class SaveCommand :	public ICommand
 {
 	size_t numOfWords = 1;

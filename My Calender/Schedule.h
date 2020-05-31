@@ -1,10 +1,11 @@
-#ifndef SCHEDULE__H
-#define SChEDULE__H
+﻿#ifndef SCHEDULE__H
+#define SCHEDULE__H
 
-//#include "Arrangement.h"
 #include "ISchedule.h"
 #include <string>
+#include <vector>
 
+/** @brief клас Schedule създава разписания със задължения за дните */
 class Schedule : public ISchedule {
 	size_t size;
 	Arrangement* arr;
@@ -12,8 +13,7 @@ class Schedule : public ISchedule {
 
 	void addSize(size_t);
 	bool hasStr(const char*, const char*) const; //checks if a given string can be found in another
-												//TODO change hasStr so that i can arr.hasStr(str) 
-
+												
 	bool isDone = 0;
 	bool isOpen = 0;
 	void del();
@@ -41,6 +41,8 @@ public:
 	Schedule& operator=(const Schedule&);
 	void print() const;
 
+	//връща масив от разписания от низ с имена на файлове
+	Schedule* getCalendars(std::vector<std::string>) const;
 
 	std::istream& read(std::istream&);
 	std::ostream& write(std::ostream&) const;
@@ -63,19 +65,23 @@ public:
 	//void book(std::string);//remove
 	//void unbook();//remove
 	void book(const Arrangement&);
-	void unbook(const Date&, const MeetingTime&);
+	bool unbook(const Date&, const MeetingTime&); //void
 	void agenda(const Date& date);
-	//template<typename T>
-	//void change(const Date&, const Time&, const char*, T);
-	//void change(const Date&, const Time&, const char*, const Date&);	//promenq denq
-	//void change(const Date&, const Time&, const char*, const Time&);	//start/endtime
-	//void change(const Date&, const Time&, const char*, const char*);	//note/name
+
+	void change(const Date&, const Time&, std::string, std::string);
+
+	void change(const Date&, const Time&, const char*, const Date&);	//promenq denq
+	void change(const Date&, const Time&, const char*, const Time&);	//start/endtime
+	void change(const Date&, const Time&, const char*, const char*);	//note/name
+
 	void find(const char*) const;
 	void holiday(const Date&);
 	void busydays(const Date&, const Date&) const;
 	Date findslot(const Date&, size_t) const;
+	Date findslotwith(const Date&, size_t, std::vector<std::string>, size_t) const; //const schedule?
 	Date findslotwith(const Date&, size_t, const Schedule*, size_t) const; //const schedule?
 	Date findslotwithOneCal(const Date&, size_t, const Schedule&) const; 
+	void merge(std::vector<std::string>, size_t);
 	void merge(const Schedule*, size_t);
 };
 

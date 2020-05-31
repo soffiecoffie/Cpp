@@ -1,8 +1,9 @@
-#ifndef BOOKCOMMAND__H
+﻿#ifndef BOOKCOMMAND__H
 #define BOOKCOMMAND__H
 
 #include "ICommand.h"
 
+/** @brief клас BookCommand помага за извикването на командата book от потребителя*/
 class BookCommand :	public ICommand
 {
 	size_t min = 6;

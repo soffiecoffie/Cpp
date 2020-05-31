@@ -1,7 +1,9 @@
-#ifndef TIME_H
+﻿#ifndef TIME_H
 #define TIME_H
 #include <fstream>
+#include <string>
 
+/** @brief клас Time създава време*/
 class Time
 {
 	int hour;
@@ -22,6 +24,7 @@ public:
 	Time& operator=(const Time&);
 
 	void print() const;
+	Time stringToTime(std::string) const;
 
 	std::istream& read(std::istream&);
 	std::ostream& write(std::ostream&) const;

@@ -1,9 +1,11 @@
-#ifndef ISCHEDULE_H
+﻿#ifndef ISCHEDULE_H
 #define ISCHEDULE_H
 
 #include <string>
+#include <vector>
 #include "Arrangement.h"
 
+/** @brief клас ISchedule е интерфейсен клас на Schedule */
 class ISchedule
 {
 public:
@@ -17,31 +19,18 @@ public:
 	virtual bool getIsDone() const = 0;
 	virtual bool getIsOpen() const = 0;
 
-	//virtual Destructor needed??
+	virtual ~ISchedule() = 0 {};
 
-	//virtual void book(const Arrangement&) = 0;
-	//virtual void unbook(const Date&, MeetingTime) = 0;
-//	template <typename T>
-//	virtual void change() = 0;
-	//virtual void agenda(const Date& date)= 0;
-	//virtual void holiday(const Date&) = 0;
-	//virtual void busydays(const Date&, const Date&) const = 0;
-	//virtual void find(const char*) const = 0;
-	//virtual Date findslot(const Date&, size_t) const = 0;
-	//virtual Date findslotwith(const Date&, size_t, const Schedule*, size_t) const = 0;
-	//virtual void merge(const Schedule*, size_t) = 0;
-	
 	virtual void book(const Arrangement&) = 0;
-	virtual void unbook(const Date&, const MeetingTime&) = 0;
-	//virtual void change() = 0;
-	//virtual void agenda() = 0;
-	//virtual void holiday() = 0;
-	//virtual void busydays() = 0;
-	//virtual void find() = 0;
-	//virtual void findslot() = 0;
-	//virtual void findslotwith() = 0;
-	//virtual void merge() = 0;
+	virtual bool unbook(const Date&, const MeetingTime&) = 0; //void
+	virtual void holiday(const Date&) = 0;
+	virtual void busydays(const Date&, const Date&) const = 0;
+	virtual void change(const Date&, const Time&, std::string, std::string) = 0;
+	virtual void find(const char*) const = 0;
+	virtual Date findslot(const Date&, size_t) const = 0;
+	virtual Date findslotwith(const Date&, size_t, std::vector<std::string>, size_t) const = 0; 
+	virtual void merge(std::vector<std::string>, size_t) = 0;
+	virtual void agenda(const Date& date) = 0;
 };
-
 
 #endif

@@ -1,8 +1,9 @@
-#ifndef SAVEASCOMMAND_H
-#define SAVEASCOMMAND_H
+﻿#ifndef SAVEASCOMMAND__H
+#define SAVEASCOMMAND__H
 
 #include "ICommand.h"
 
+/** @brief клас SaveAsCommand помага за извикването на командата saveas от потребителя*/
 class SaveAsCommand : public ICommand
 {
 	size_t numOfWords = 2;

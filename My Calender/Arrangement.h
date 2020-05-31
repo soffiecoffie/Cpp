@@ -1,12 +1,13 @@
-#ifndef ARRANGEMENT_H
+﻿#ifndef ARRANGEMENT_H
 #define ARRANGEMENT_H
 #include "Date.h"
 #include "MeetingTime.h"
 
+/** @brief клас Arrangement създава срещи*/
 class Arrangement {
 	bool holiday = false;
-	char* name; 
-	char* note; 
+	char* name = nullptr; 
+	char* note = nullptr; 
 	Date day;
 	MeetingTime time;
 
@@ -15,6 +16,7 @@ public:
 	Arrangement(const char*, const char*, const Date&, const MeetingTime&);
 	Arrangement(const Date&, const MeetingTime&);
 	Arrangement(bool, const Date&);
+	Arrangement(const Arrangement&) = delete;
 	~Arrangement();
 
 	Date getDay() const { return day; };
