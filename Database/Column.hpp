@@ -1,10 +1,10 @@
-#include <iomanip>
+﻿#include <iomanip>
 #include <iostream>
 #include <cassert>
 #include "Column.h"
 #include "Utils.h"
 
-//конструктор с параметри
+/** @brief конструктор с параметри */
 template<typename T>
 Column<T>::Column(const std::string& _title, const std::string& _type, const T* _cells, size_t _size)
 				 : size(0), cells(nullptr), title(_title)
@@ -13,27 +13,39 @@ Column<T>::Column(const std::string& _title, const std::string& _type, const T* 
 	setCells(_cells, _size);
 }
 
-//конструктор с параметър
+/** @brief конструктор с параметър */
 template<typename T>
 Column<T>::Column(const char* type): size(0), title(""), cells(nullptr)
 {
 	setType(type);
 }
 
-//конструктор по подразбиране
+/** @brief конструктор с параметри */
+template<typename T>
+Column<T>::Column(const std::string& _type, const std::string& _title, size_t s): size(s), title(_title)
+{
+	cells = new T * [size];
+	for (size_t i = 0; i < size; ++i)
+	{
+		cells[i] = nullptr;
+	}
+	setType(_type);
+}
+
+/** @brief конструктор по подразбиране */
 template<typename T>
 Column<T>::Column() : size(0), title(""), type(""), cells(nullptr)
 {
 }
 
-//деструктор
+/** @brief деструктор */
 template<typename T>
 Column<T>::~Column()
 {
 	del();
 }
 
-//изтрива динамичната памет
+/** @brief изтрива динамичната памет */
 template<typename T>
 void Column<T>::del()
 {
@@ -44,14 +56,16 @@ void Column<T>::del()
 	delete[] cells;
 }
 
-//добавя още едно място към масива
+/** @brief добавя още едно място към масива */
 template<typename T>
 void Column<T>::addSpace()
 {
-	T* temp = new T[size];
+	T* temp[240];
 	for (size_t i = 0; i < size; ++i)
 	{
-		temp[i] = *cells[i];
+		temp[i] = new T;
+		if (cells[i] == nullptr) temp[i] = nullptr;
+		else *temp[i] = *cells[i];
 	}
 
 	del();
@@ -59,22 +73,45 @@ void Column<T>::addSpace()
 	cells = new T * [++size];
 	for (size_t i = 0; i < size - 1; ++i)
 	{
-		cells[i] = new T;
-		*cells[i] = temp[i];
+		if (temp[i] == nullptr) {
+			cells[i] = nullptr;
+		}
+		else {
+			cells[i] = new T(*temp[i]);
+		}
 	}
 
-	delete[] temp;
+	for (size_t i = 0; i < size -1 ; ++i)
+	{
+		delete temp[i];
+	}
 }
 
-//връща броя на цифрите в клетката
+/** @brief връща броя на цифрите в клетката */
 template<typename T>
 size_t Column<T>::getCellLength(size_t ind) const
 {
 	if (cells[ind] == nullptr) return 4;
-	return digits(*cells[ind]);
+	int digitsCount = digits(*cells[ind]);
+	return (*cells[ind] < 0) ? ((digitsCount == 0) ? 2 : digitsCount + 1) : ((digitsCount == 0) ? 1 : digitsCount);
+	// първото брои знака за минус ако е отрицателно
+	// 1ницата във второто е за да може нулата да се принтира без проблеми
 }
 
-//връща броя на символите в клетката
+/** @brief връща броя на цифрите в клетката +1 за десетичната запетая */
+template<>
+inline size_t Column<double>::getCellLength(size_t ind) const
+{
+	if (cells[ind] == nullptr) return 4;
+	int digitsCount = digits(*cells[ind]);
+	//return (digitsCount == 0) ?  1 + 3 : digitsCount + 3;
+	return (*cells[ind] < 0) ? ((digitsCount == 0) ? 1 + 4 : digitsCount + 4) : ((digitsCount == 0) ? 1 + 3 : digitsCount + 3);
+	// 1 + 4 -> за да преброя минуса
+	// digitsCount + 3 -> за да преброя десетичната запетая и 2 цифри след нея 
+	// 1 + 3 -> за да няма проблеми с цифри като 0,01
+}
+
+/** @brief връща броя на символите в клетката */
 template<>
 inline size_t Column<std::string>::getCellLength(size_t ind) const
 {
@@ -82,7 +119,7 @@ inline size_t Column<std::string>::getCellLength(size_t ind) const
 	return cells[ind]->size();
 }
 
-//принтира линията на клетката
+/** @brief принтира линията на клетката */
 template<typename T>
 std::ostream& Column<T>::printCellLine(std::ostream& out) const
 {
@@ -92,7 +129,7 @@ std::ostream& Column<T>::printCellLine(std::ostream& out) const
 	return out;
 }
 
-//принтира заглавието на клетката
+/** @brief принтира заглавието на клетката */
 template<typename T>
 std::ostream& Column<T>::printCellTitle(std::ostream& out) const
 {
@@ -109,7 +146,7 @@ std::ostream& Column<T>::printCellTitle(std::ostream& out) const
 	return out;
 }
 
-//принтира съдържанието на клетката
+/** @brief принтира съдържанието на клетката */
 template<typename T>
 std::ostream& Column<T>::printCellContents(size_t i, std::ostream& out) const 
 {
@@ -132,7 +169,8 @@ std::ostream& Column<T>::printCellContents(size_t i, std::ostream& out) const
 		if (isOdd(pad)) printPadding(pad + 1, out); 
 		else printPadding(pad, out);
 
-		out << *cells[i];
+		if (type == "double") out << std::fixed << std::setprecision(2) << *cells[i];
+		else out << *cells[i];
 	}
 
 	printPadding(pad, out);
@@ -140,7 +178,7 @@ std::ostream& Column<T>::printCellContents(size_t i, std::ostream& out) const
 	return out;
 }
 
-//принтира празно място
+/** @brief принтира празно място */
 template<typename T>
 std::ostream& Column<T>::printPadding(size_t pad, std::ostream& out) const
 {
@@ -148,28 +186,28 @@ std::ostream& Column<T>::printPadding(size_t pad, std::ostream& out) const
 	return out;
 }
 
-//връща големината на колоната
+/** @brief връща големината на колоната */
 template<typename T>
-size_t Column<T>::getColSize() const
+size_t Column<T>::getRowSize() const
 {
 	return size;
 }
 
-//връща низ с типа на колоната
+/** @brief връща типа на колоната като низ */
 template<typename T>
 std::string Column<T>::getType() const
 {
 	return type;
 }
 
-//връща заглавието на колоната
+/** @brief връща заглавието на колоната */
 template<typename T>
 std::string Column<T>::getTitle() const
 {
 	return title;
 }
 
-//връща низ от стойността на дадена клетка
+/** @brief връща стойността на дадена клетка като низ */
 template<typename T>
 std::string Column<T>::getCellAt(size_t ind) const
 {
@@ -177,55 +215,106 @@ std::string Column<T>::getCellAt(size_t ind) const
 	return std::to_string(*cells[ind]);
 }
 
-//връща низ от стойността на дадена клетка на колона от тип std::string
+/** @brief връща низ от стойността на дадена клетка на колона от тип std::string */
 template<>
 inline std::string Column<std::string>::getCellAt(size_t ind) const
 {
-	return *cells[ind];
+	return *cells[ind]; 
 }
 
-//връща масив от указатели към стойностите на колоната
+/** @brief връща масив от указатели към стойностите на колоната */
 template<typename T>
 T** Column<T>::getCells() const
 {
 	return cells;
 }
 
-//добавя нова клетка
+/** @brief заменя стойностите на клетките на текущата колона с тези на друга */
+template<typename T>
+void Column<T>::copyOtherCells(const IColumn& other)
+{
+	del();
+
+	size = other.getRowSize();
+
+	cells = new T * [size];
+	for (size_t i = 0; i < size; ++i)
+	{
+		if (other.getCellAt(i) == "NULL") cells[i] = nullptr;
+		else cells[i] = new T(other.getCellAt(i));
+	}
+}
+
+/** @brief заменя стойностите на клетките на текущата колона с тези на друга */
+template<>
+inline void Column<int>::copyOtherCells(const IColumn& other)
+{
+	del();
+
+	size = other.getRowSize();
+
+	cells = new int * [size];
+	for (size_t i = 0; i < size; ++i)
+	{
+		if (other.getCellAt(i) == "NULL") cells[i] = nullptr;
+		else cells[i] = new int(std::stoi(other.getCellAt(i)));
+	}
+}
+
+/** @brief заменя стойностите на клетките на текущата колона с тези на друга */
+template<>
+inline void Column<double>::copyOtherCells(const IColumn& other)
+{
+	del();
+
+	size = other.getRowSize();
+
+	cells = new double * [size];
+	for (size_t i = 0; i < size; ++i)
+	{
+		if (other.getCellAt(i) == "NULL") cells[i] = nullptr;
+		else cells[i] = new double(std::stod(other.getCellAt(i)));
+	}
+}
+
+/** @brief добавя нова клетка */
 template<typename T>
 void Column<T>::addCell(std::string cell)
 {
 	addSpace();
 
-	cells[size - 1] = new T(cell);
+	if (cell == "NULL") cells[size - 1] = nullptr;
+	else cells[size - 1] = new T(cell);
 }
 
-//добавя нова клетка в колона от тип int
+/** @brief добавя нова клетка в колона от тип int */
 template<>
 inline void Column<int>::addCell(std::string cell)
 {
 	addSpace();
 
-	cells[size - 1] = new int(std::stoi(cell)); 
+	if (cell == "NULL") cells[size - 1] = nullptr;
+	else cells[size - 1] = new int(std::stoi(cell)); 
 }
 
-//добавя нова клетка в колона от тип double
+/** @brief добавя нова клетка в колона от тип double */
 template<>
 inline void Column<double>::addCell(std::string cell)
 {
 	addSpace();
 
-	cells[size - 1] = new double(std::stod(cell));
+	if (cell == "NULL") cells[size - 1] = nullptr;
+	else cells[size - 1] = new double(std::stod(cell));
 }
 
-//задава стойност на заглавието
+/** @brief задава нова стойност на заглавието */
 template<typename T>
 void Column<T>::setTitle(const std::string& t)
 {
 	title = t;
 }
 
-//задава стойност на масива от указатели
+/** @brief задава нови стойности на клетките на колоната */
 template<typename T>
 void Column<T>::setCells(const T* arr, size_t s)
 {
@@ -240,7 +329,7 @@ void Column<T>::setCells(const T* arr, size_t s)
 	}
 }
 
-//задава стойност на типа на колоната
+/** @brief задава стойност на типа на колоната */
 template<typename T>
 void Column<T>::setType(const std::string& t)
 {
@@ -248,7 +337,7 @@ void Column<T>::setType(const std::string& t)
 	type = t;
 }
 
-//връща дължината на най-дългата клетка
+/** @brief връща дължината на най-дългата клетка */
 template<typename T>
 size_t Column<T>::getLongest() const
 {
@@ -265,7 +354,7 @@ size_t Column<T>::getLongest() const
 	return getCellLength(max);
 }
 
-//принтира колоната
+/** @brief принтира колоната */
 template<typename T>
 void Column<T>::print() const
 {
@@ -286,7 +375,7 @@ void Column<T>::print() const
 	std::cout << "\n";
 }
 
-//задава стойността на дадена клетка да бъде nullptr
+/** @brief задава стойността на дадена клетка да бъде nullptr */
 template<typename T>
 void Column<T>::setNullCellAt(size_t ind)
 {
