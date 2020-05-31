@@ -1,8 +1,9 @@
-#ifndef SHOWTABLESCOMMAND__H
-#define SHOWTABLESCOMMAND__H
+﻿#ifndef SHOWTABLESCOMMAND_H
+#define SHOWTABLESCOMMAND_H
 
 #include "ICommand.h"
 
+/** @brief клас ShowtablesCommand помага за извикването на командата showtables от потребителя*/
 class ShowtablesCommand : public ICommand
 {
 private:
@@ -10,6 +11,8 @@ private:
 
 public:
 	ShowtablesCommand(IDatabase*);
+	/** @brief деструктор */
+	~ShowtablesCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

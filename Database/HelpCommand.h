@@ -1,8 +1,9 @@
-#ifndef HELPCOMMAND_H
+﻿#ifndef HELPCOMMAND_H
 #define HELPCOMMAND_H
 #include "ICommand.h"
 
 
+/** @brief клас HelpCommand помага за извикването на командата help от потребителя*/
 class HelpCommand : public ICommand
 {
 private:
@@ -10,6 +11,8 @@ private:
 
 public:
 	HelpCommand(IDatabase*);
+	/** @brief деструктор */
+	~HelpCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

@@ -1,5 +1,5 @@
-﻿#ifndef DATABASE__H
-#define DATABASE__H
+﻿#ifndef DATABASE_H
+#define DATABASE_H
 
 #include "Table.h"
 #include "IDatabase.h"
@@ -8,11 +8,12 @@
 #include <string>
 #include <fstream>
 
+/** @brief клас Database създава база от данни */
 class Database: public IDatabase
 {
 	std::vector<ITable*> tables;		//таблиците които са отворени ако има такива
-	std::string catalog = "";				//name of DB file
-	std::vector<std::string> tableInfo; //tab.txt tabName
+	std::string catalog = "";			//името на каталога на базата от данни
+	std::vector<std::string> tableInfo; 
 
 private:
 	void del();
@@ -38,7 +39,7 @@ public:
 	void saveas(std::string);
 	void exit();
 
-	void import(std::string); //import запазена дума ли е?
+	void import(std::string); 
 	void showtables() const;
 	void describe(std::string) const;
 	void myExport(std::string, std::string) const;
@@ -53,7 +54,7 @@ public:
 
 	void addColumn(std::string, std::string, std::string);
 
-	std::istream& read(std::istream&); //make bin
+	std::istream& read(std::istream&);
 	std::ostream& write(std::ostream&) const;
 
 	ITable* getTableByName(std::string) const;

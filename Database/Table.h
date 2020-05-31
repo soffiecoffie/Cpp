@@ -1,10 +1,11 @@
-#ifndef TABLE_H
+﻿#ifndef TABLE_H
 #define TABLE_H
 
 #include "ITable.h"
 #include "Column.h"
 #include <string>
 
+/** @brief клас Table създава таблици */
 class Table : public ITable
 {
 	size_t size;

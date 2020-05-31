@@ -1,11 +1,12 @@
-﻿#ifndef UTILS__H
-#define UTILS__H
+﻿#ifndef UTILS_H
+#define UTILS_H
 #include <fstream>
 #include <string>
 
 //Полезни функции
 
 int digits(int);
+int digits(double n);
 bool isOdd(int);
 std::ostream& printMany(const char*, size_t, std::ostream&);
 bool isSpaceBetweenWords(std::string, size_t);

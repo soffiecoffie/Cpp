@@ -1,11 +1,15 @@
-#ifndef IDATABASE__H
-#define IDATABASE__H
+﻿#ifndef IDATABASE_H
+#define IDATABASE_H
 
 #include <string>
 
+/** @brief клас IDatabase е интерфейсен клас на Database */
 class IDatabase
 {
 public:
+	/** @brief деструктор */
+	virtual ~IDatabase() = 0 {};
+
 	virtual void open(std::string) = 0;
 	virtual void close() = 0;
 	virtual void save() = 0;

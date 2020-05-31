@@ -1,14 +1,16 @@
 ﻿#include "Database.h"
 
+/** @brief изтрива динамичната памет и изпразва tableInfo */
 void Database::del()
 {
 	for (size_t i = 0; i < tables.size(); ++i)
 	{
 		delete tables[i];
 	}
+	tableInfo.clear();
 }
 
-//проверява дали дадена таблица е вече заредена
+/** @brief проверява дали дадена таблица е вече заредена */
 bool Database::isImported(std::string filename) const
 {
 	std::ifstream in(filename);
@@ -23,28 +25,30 @@ bool Database::isImported(std::string filename) const
 	return false;
 }
 
-//конструктор по подразбиране
+/** @brief конструктор по подразбиране*/
 Database::Database() : tables({}), tableInfo({})
 {
 }
 
-//конструктор с параметри
+/** @brief конструктор с параметри */
 Database::Database(std::vector<ITable*> arr, std::string c, std::vector<std::string> tInfo) : tables(arr), tableInfo(tInfo),
 																							catalog(c)
 {
 }
 
-//деструктор
+/** @brief деструктор */
 Database::~Database()
 {
 	del();
 }
 
+/** @brief задава нова име на каталога на базата данни */
 void Database::setCatalogName(std::string str)
 {
 	catalog = str;
 }
 
+/** @brief отваря вече съществуваща или създава нова база данни и записва данните ѝ */
 void Database::open(std::string input)
 {
 	std::ifstream in(input, std::ios::in);
@@ -65,6 +69,7 @@ void Database::open(std::string input)
 	std::cout << "Successfully opened file " << input << "!\n";
 }
 
+/** @brief изтрива данните на базата данни */
 void Database::close()
 {
 	del();
@@ -74,6 +79,7 @@ void Database::close()
 	std::cout << "Successfully closed catalog " << catalog << std::endl;
 }
 
+/** @brief запазва промените във оригиналния файл на базата данни */
 void Database::save()
 {
 	std::ofstream out(catalog);
@@ -86,6 +92,7 @@ void Database::save()
 	}
 }
 
+/** @brief записва базата данни в нов файл */
 void Database::saveas(std::string input)
 {
 	std::ofstream out(input);
@@ -98,13 +105,14 @@ void Database::saveas(std::string input)
 	}
 }
 
+/** @brief излиза от програмата */
 void Database::exit()
 {
 	std::cout << "Exiting the program...";
 	isDone = 1;
 }
 
-//зарежда нова таблица
+/** @brief зарежда нова таблица */
 void Database::import(std::string filename)
 {
 	if (isImported(filename)) {
@@ -131,11 +139,9 @@ void Database::import(std::string filename)
 			std::cout << filename << " has successfully been imported!\n";
 		}
 	}
-
-
 }
 
-/*показва списък с имената на всички заредени таблици*/
+/** @brief показва списък с имената на всички заредени таблици */
 void Database::showtables() const
 {
 	std::cout << std::endl;
@@ -148,6 +154,7 @@ void Database::showtables() const
 	std::cout << "Successfully executed command!\n";
 }
 
+/** @brief описва типа на всяка колона от дадена таблица */
 void Database::describe(std::string name) const
 {
 	ITable* t = getTableByName(name);
@@ -163,6 +170,7 @@ void Database::describe(std::string name) const
 	std::cout << "\nSuccessfully executed command!\n";
 }
 
+/** @brief записва таблица във файл */
 void Database::myExport(std::string name, std::string filename) const
 {
 	ITable* t = getTableByName(name);
@@ -176,6 +184,7 @@ void Database::myExport(std::string name, std::string filename) const
 	}
 }
 
+/** @brief принтира всички редове от дадена таблица с режим за разглеждане по страници, ако не се побира на екрана цялата */
 void Database::print(std::string tableName)
 {
 	ITable* t = getTableByName(tableName);
@@ -208,6 +217,7 @@ void Database::print(std::string tableName)
 	}
 }
 
+/** @brief преименува таблица */
 void Database::rename(std::string oldName, std::string newName)
 {
 	ITable* t = getTableByName(oldName);
@@ -233,6 +243,7 @@ void Database::rename(std::string oldName, std::string newName)
 	std::cout << "Successfully renamed table " << oldName << " to " << newName << "!\n";
 }
 
+/** @brief излиза от режим за разглеждане по страници */
 void Database::out()
 {
 	isPageCmdOn = 0;
@@ -241,6 +252,7 @@ void Database::out()
 	std::cout << "Successfully left page mode!\n";
 }
 
+/** @brief отива на следващата страница */
 void Database::next(std::string tableName)
 {
 	ITable* t = getTableByName(tableName);
@@ -262,6 +274,7 @@ void Database::next(std::string tableName)
 	}
 }
 
+/** @brief връща се на миналата страница */
 void Database::previous(std::string tableName)
 {
 	ITable* t = getTableByName(tableName);
@@ -277,6 +290,7 @@ void Database::previous(std::string tableName)
 	}
 }
 
+/** @brief добавя нова колона в дадена таблица */
 void Database::addColumn(std::string tableName, std::string colName, std::string type)
 {
 	ITable* t = getTableByName(tableName);
@@ -288,6 +302,7 @@ void Database::addColumn(std::string tableName, std::string colName, std::string
 	std::cout << "Successfully added a column!\n";
 }
 
+/** @brief прочита база от данни */
 std::istream& Database::read(std::istream& in)
 {
 	size_t tableInfoSize;
@@ -314,13 +329,12 @@ std::istream& Database::read(std::istream& in)
 		tables[lastInd]->setFileName(filename);
 		
 		in.close();
-		//tables[i]->print(std::cout);
-		//std::cout << std::endl;
 	}
 
 	return in;
 }
 
+/** @brief записва база от данни във файл или извежда на екрана */
 std::ostream& Database::write(std::ostream& out) const
 {
 	size_t tableInfoSize = tableInfo.size();
@@ -342,6 +356,7 @@ std::ostream& Database::write(std::ostream& out) const
 	return out;
 }
 
+/** @brief връща указател към таблица с дадено име */
 ITable* Database::getTableByName(std::string name) const
 {
 	for (size_t i = 0; i < tables.size(); ++i)
@@ -351,16 +366,19 @@ ITable* Database::getTableByName(std::string name) const
 	return nullptr;
 }
 
+/** @brief връща истина, ако потребителят е отворил/създал база от данни */
 bool Database::getIsOpen() const
 {
 	return isOpen;
 }
 
+/** @brief връща истина, ако потребителят е готов да излезе от програмата */
 bool Database::getIsDone() const
 {
 	return isDone;
 }
 
+/** @brief връща истина, ако е включен режима за разглеждане по страници */
 bool Database::getIsPageCmdOn() const
 {
 	return isPageCmdOn;

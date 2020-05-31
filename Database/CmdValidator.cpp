@@ -1,7 +1,7 @@
 ﻿#include "CmdValidator.h"
 #include "Utils.h"
 
-//връща истина ако командата е валидна
+/** @brief връща истина ако командата е валидна */
 bool CmdValidator::validateCommand(const ICommand* ptr, std::string str)
 {
 	size_t wordsInStr = numOfWords(str);

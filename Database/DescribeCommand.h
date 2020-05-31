@@ -1,8 +1,9 @@
-#ifndef DESCRIBECOMMAND__H
-#define DESCRIBECOMMAND__H
+﻿#ifndef DESCRIBECOMMAND_H
+#define DESCRIBECOMMAND_H
 
 #include "ICommand.h"
 
+/** @brief клас DescribeCommand помага за извикването на командата describe от потребителя*/
 class DescribeCommand :	public ICommand
 {
 private:
@@ -10,6 +11,8 @@ private:
 
 public:
 	DescribeCommand(IDatabase*);
+	/** @brief деструктор */
+	~DescribeCommand() {};
 	
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

@@ -1,5 +1,7 @@
-#include "IColumn.h"
+﻿#include "IColumn.h"
 
+
+/** @brief предефинира оператор = */
 IColumn& IColumn::operator=(const IColumn& other)
 {
 	if (this != &other) {

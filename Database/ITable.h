@@ -1,13 +1,14 @@
-#ifndef ITable_H
+﻿#ifndef ITable_H
 #define ITable_H
 
-//#include "IColumn.h"
 #include "Column.h"
 #include <string>
 
+/** @brief клас ITable е интерфейсен клас на Table */
 class ITable
 {
 public:
+	/** @brief деструктор */
 	virtual ~ITable() = 0 {};
 
 	virtual std::ostream& print(std::ostream& out) const = 0;
@@ -30,7 +31,6 @@ public:
 
 	virtual void printFromTo(size_t, size_t) const = 0;
 	virtual void printRows(size_t, size_t) const = 0;
-	//add AddCol func
 };
 
 #endif

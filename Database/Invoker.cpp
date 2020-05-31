@@ -1,4 +1,4 @@
-#include "Invoker.h"
+﻿#include "Invoker.h"
 #include "CmdValidator.h"
 #include "OpenCommand.h"
 #include "SaveCommand.h"
@@ -19,6 +19,7 @@
 
 #include <iostream>
 
+/** @brief конструктор с параметър*/
 Invoker::Invoker(IDatabase* db)
 {
 	commands.push_back(new OpenCommand(db));
@@ -39,6 +40,16 @@ Invoker::Invoker(IDatabase* db)
 	commands.push_back(new AddColumnCommand(db));
 }
 
+/** @brief деструктор */
+Invoker::~Invoker()
+{
+	for (size_t i = 0; i < commands.size(); ++i)
+	{
+		delete commands[i];
+	}
+}
+
+/** @brief извиква желаната команда от подаден низ */
 void Invoker::executeCmd(std::string input)
 {
 	for (ICommand* cmd : commands) {

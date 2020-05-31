@@ -1,8 +1,9 @@
-#ifndef IMPORTCOMMAND_H
+﻿#ifndef IMPORTCOMMAND_H
 #define IMPORTCOMMAND_H
 
 #include "ICommand.h"
 
+/** @brief клас ImportCommand помага за извикването на командата import от потребителя*/
 class ImportCommand : public ICommand
 {
 private:
@@ -10,6 +11,8 @@ private:
 
 public:
 	ImportCommand(IDatabase*);
+	/** @brief деструктор */
+	~ImportCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

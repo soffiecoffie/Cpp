@@ -2,20 +2,29 @@
 #include <iostream>
 #include <cassert>
 
-//връща броя на цифрите на дадено число
+const double eps = 0.9999999999;
+
+/** @brief връща броя на цифрите на дадено число */
 int digits(int n)
 {
 	if (n == 0)	return 0;
 	return 1 + digits(n / 10);
 }
 
-//връща истина ако подаденото число е нечетно
+/** @brief връща броя на цифрите преди десетичната запетайка на дадено число */
+int digits(double n)
+{
+	if (fabs(n - 0) < eps)	return 0;
+	return 1 + digits(n / 10);
+}
+
+/** @brief връща истина ако подаденото число е нечетно */
 bool isOdd(int n) 
 {
 	return n % 2 != 0;
 }
 
-//извежда на екрана даден символ по даден брой пъти
+/** @brief извежда на екрана даден символ по даден брой пъти */
 std::ostream& printMany(const char* ch, size_t n, std::ostream& out)
 {
 	for (size_t i = 0; i < n; ++i)
@@ -26,7 +35,7 @@ std::ostream& printMany(const char* ch, size_t n, std::ostream& out)
 }
 
 
-//проверява дали празното място на подадения индекс в дадения низ се намира между думи
+/** @brief проверява дали празното място на подадения индекс в дадения низ се намира между думи */
 bool isSpaceBetweenWords(std::string str, size_t ind)
 {
 	assert(str[ind] == ' ');
@@ -36,9 +45,10 @@ bool isSpaceBetweenWords(std::string str, size_t ind)
 	return false; //ако е първия или последния символ 
 }
 
-//връща думата, която е num по ред в подадения низ str
-std::string getWord(size_t num, const std::string& str) //validation if it has enough words to ask for the num one
+/** @brief връща думата, която е n-та по ред в подадения низ str */
+std::string getWord(size_t num, const std::string& str) 
 {
+	assert(numOfWords(str) >= num);
 	std::string result = str;
 	size_t start = 0;
 	size_t counter = 0;
@@ -67,7 +77,7 @@ std::string getWord(size_t num, const std::string& str) //validation if it has e
 	}
 }
 
-//връща броя на думите в даден низ
+/** @brief връща броя на думите в даден низ */
 size_t numOfWords(std::string s)
 {
 	size_t counter = 0;
