@@ -1,8 +1,7 @@
-﻿#ifndef OPENCOMMAND__H
-#define OPENCOMMAND__H
+﻿#ifndef OPENCOMMAND_H
+#define OPENCOMMAND_H
 
 #include "ICommand.h"
-#include "ISchedule.h"
 
 /** @brief клас OpenCommand помага за извикването на командата open от потребителя*/
 class OpenCommand :	public ICommand
@@ -12,6 +11,8 @@ private:
 
 public:
 	OpenCommand(ISchedule*);
+	/** @brief деструктор */
+	~OpenCommand() {};
 	
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

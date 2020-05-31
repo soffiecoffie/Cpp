@@ -1,5 +1,5 @@
-﻿#ifndef INVOKER__H
-#define INVOKER__H
+﻿#ifndef INVOKER_H
+#define INVOKER_H
 
 #include "ICommand.h"
 #include <vector>
@@ -12,6 +12,7 @@ class Invoker
 
 public:
 	Invoker(ISchedule*);
+	~Invoker();
 
 	void executeCmd(std::string);
 };

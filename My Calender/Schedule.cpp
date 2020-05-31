@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cassert>
 
-//увеличава големината в зависимост от подадената големина
+/** @brief увеличава големината с n */
 void Schedule::addSize(size_t n)
 {
 	Arrangement* temp = new Arrangement[size];
@@ -23,7 +23,7 @@ void Schedule::addSize(size_t n)
 	delete[] temp;
 }
 
-//проверява дали даден низ се намира в друг
+/** @brief проверява дали даден низ се намира в друг */
 bool Schedule::hasStr(const char* original, const char* str) const
 {
 	int count = 0;
@@ -51,11 +51,13 @@ bool Schedule::hasStr(const char* original, const char* str) const
 	return false;
 }
 
+/** @brief помощна функция за изтриване на динамичната памет */
 void Schedule::del()
 {
 	delete[] arr;
 }
 
+/** @brief конструктор с параметри */
 Schedule::Schedule(const Arrangement* _arr, size_t _size): size(_size), arr(new Arrangement[size])
 {
 	for (size_t i = 0; i < size; ++i)
@@ -64,26 +66,41 @@ Schedule::Schedule(const Arrangement* _arr, size_t _size): size(_size), arr(new 
 	}
 }
 
+/** @brief копи конструктор */
+Schedule::Schedule(const Schedule& other): Schedule(other.getArr(), other.getSize())
+{
+}
+
+/** @brief деструктор */
 Schedule::~Schedule()
 {
 	del();
 }
 
+/** @brief задава ново име на файла */
 void Schedule::setUserFile(std::string str)
 {
 	userFile = str;
 }
 
+/** @brief връща големината */
 size_t Schedule::getSize() const
 {
 	return size;
 }
 
+/** @brief връща срещата на дадено място в масива */
 Arrangement& Schedule::getArrangement(size_t ind) const
 {
 	return arr[ind];
 }
+/** @brief връща масива от срещи в календара */
+Arrangement* Schedule::getArr() const
+{
+	return arr;
+}
 
+/** @brief връща индекса, на който се намира някоя среща по нейната дата и начало */
 int Schedule::findIndex(const Date& d, const Time& start)
 {
 	for (size_t i = 0; i < size; ++i)
@@ -95,6 +112,7 @@ int Schedule::findIndex(const Date& d, const Time& start)
 	return -1;
 }
 
+/** @brief връща времето заетост за даден ден в минути */
 size_t Schedule::getBusyMinutes(const Date& d) const
 {
 	int length = 0;
@@ -107,11 +125,13 @@ size_t Schedule::getBusyMinutes(const Date& d) const
 	return length;
 }
 
+/** @brief връща истина, ако незаписана среща се застъпва с друга */
 bool Schedule::overlap(const Arrangement& other) const
 {
 	return overlapOthers(other, -1);
 }
 
+/** @brief връща истина, ако подадената среща се застъпва с друга */
 bool Schedule::overlapOthers(const Arrangement& other, int ind) const
 {
 	for (size_t i = 0; i < size; ++i)
@@ -126,6 +146,7 @@ bool Schedule::overlapOthers(const Arrangement& other, int ind) const
 	return false;
 }
 
+/** @brief връща срещата, с която се застъпва дадена среща */
 Arrangement& Schedule::getOverlappedArr(const Arrangement& other) const
 {
 	assert(overlap(other));
@@ -140,6 +161,7 @@ Arrangement& Schedule::getOverlappedArr(const Arrangement& other) const
 	}
 }
 
+/** @brief разменя местата на срещи в масив по техните индекси */
 void Schedule::swapArrangements(size_t i, size_t j)
 {
 	Arrangement temp;
@@ -148,6 +170,7 @@ void Schedule::swapArrangements(size_t i, size_t j)
 	arr[j] = temp;
 }
 
+/** @brief сортира масива от срещи хронологично */
 void Schedule::sortChronologically()
 {
 	int min;
@@ -164,6 +187,7 @@ void Schedule::sortChronologically()
 	}
 }
 
+/** @brief връща истина, ако подадената дата е празник */
 bool Schedule::isHoliday(const Date& d) const
 {
 	for (size_t i = 0; i < size; ++i)
@@ -173,6 +197,7 @@ bool Schedule::isHoliday(const Date& d) const
 	return false;
 }
 
+/** @brief проверява дали има свободно място за среща в даден ден за определено време */
 bool Schedule::hasFreeSlot(const Date& d, size_t hours) const
 {
 	int h = 8, m = 0;
@@ -189,6 +214,7 @@ bool Schedule::hasFreeSlot(const Date& d, size_t hours) const
 	return false;
 }
 
+/** @brief връща свободно място за среща в даден ден с дадена дължина */
 MeetingTime Schedule::getFreeSlot(const Date& d, size_t hours) const
 {
 	assert(hasFreeSlot(d, hours));
@@ -202,6 +228,7 @@ MeetingTime Schedule::getFreeSlot(const Date& d, size_t hours) const
 	} while (h <= 16 && h + hours <= 16 && m <= 59);
 }
 
+/** @brief слива всички календари в един с възможност за застъпване */
 Schedule Schedule::allBusyHours(const Schedule* cal, size_t calSize) const
 {
 	size_t resultSize = 0;
@@ -209,7 +236,6 @@ Schedule Schedule::allBusyHours(const Schedule* cal, size_t calSize) const
 	{
 		resultSize += cal[i].getSize();
 	}
-
 
 	Arrangement* arrs = new Arrangement[resultSize];
 	size_t spot = 0;
@@ -224,6 +250,7 @@ Schedule Schedule::allBusyHours(const Schedule* cal, size_t calSize) const
 	return Schedule (arrs, resultSize);
 }
 
+/** @brief предефинира оператор = */
 Schedule& Schedule::operator=(const Schedule& other)
 {
 	if (this != &other) {
@@ -239,6 +266,7 @@ Schedule& Schedule::operator=(const Schedule& other)
 	return *this;
 }
 
+/** @brief принтира всички срещи в календара */
 void Schedule::print() const
 {
 	for (size_t i = 0; i < size; ++i)
@@ -248,10 +276,10 @@ void Schedule::print() const
 	}
 }
 
+/** @brief връща масив от няколко календара от съответните им файлове */
 Schedule* Schedule::getCalendars(std::vector<std::string> files) const
 {
 	Schedule* calendars = new Schedule[files.size()];
-	char* temp = new char[20];
 	for (size_t i = 0; i < files.size(); i++)
 	{
 		std::ifstream in(files[i].c_str());
@@ -261,9 +289,9 @@ Schedule* Schedule::getCalendars(std::vector<std::string> files) const
 	return calendars;
 }
 
+/** @brief прочита календар */
 std::istream& Schedule::read(std::istream& in)
 {
-	char* temp = new char[50];
 	size_t num;
 	in.ignore(100, '\n');
 	in.ignore(22);
@@ -281,6 +309,7 @@ std::istream& Schedule::read(std::istream& in)
 	return in;
 }
 
+/** @brief записва календар във файл */
 std::ostream& Schedule::write(std::ostream& out) const
 {
 	out << "Welcome to your personal calendar!\n"
@@ -293,21 +322,22 @@ std::ostream& Schedule::write(std::ostream& out) const
 	return out;
 }
 
+/** @brief отваря съществуващ календар или създава нов */
 void Schedule::open(std::string input)
 {
-	input.erase(0, CmdValidator::getFirstSpaceInd(input) + 1);
-	
+	input = getWord(2, input);
 	std::ifstream in(input, std::ios::in);
 	if (!in) {
-		//creates a file and if it doesnt get saved it stays empty
 		std::ofstream out(input);
 		if (!out) {
 			std::cout << "Can't open file " << input << " try again\n"; 
 		}
-		//fills the file with the basic calendar.txt
-		write(out);				 //yay or nay? 
-		setUserFile(input);		 //creates a new file if it gets saved, update - not anymore
-		isOpen = 1;
+		else {
+			write(out);
+			setUserFile(input);
+			isOpen = 1;
+
+		}
 	}
 	else {
 		read(in);
@@ -319,16 +349,18 @@ void Schedule::open(std::string input)
 	std::cout << "Successfully opened file " << input << std::endl;
 }
 
+/** @brief затваря календара */
 void Schedule::close()
 {
 	del();
 	isDone = 0;
 	size = 0;
 	isOpen = 0;
-	std::cout << "No changes were made to your calendar.\n";
+	//std::cout << "No changes were made to your calendar.\n";
 	std::cout << "Successfully closed file " << userFile << std::endl;
 }
 
+/** @brief запазва промените по календара в същия файл */
 void Schedule::save()
 {
 	std::ofstream out(userFile);
@@ -341,10 +373,11 @@ void Schedule::save()
 	}
 }
 
+/** @brief запазва календара в даден файл */
 void Schedule::saveas(std::string input)
 {
-	input.erase(0, CmdValidator::getFirstSpaceInd(input) + 1);
-
+	//input.erase(0, CmdValidator::getFirstSpaceInd(input) + 1);
+	input = getWord(2, input);
 	std::ofstream out(input);
 	if (!out) {
 		std::cout << "Can't save file as" << input << std::endl;
@@ -352,26 +385,30 @@ void Schedule::saveas(std::string input)
 	else {
 		write(out);
 
-		std::cout << "Successfully saved " << input << std::endl;
+		std::cout << "Successfully saved as" << input << std::endl;
 	}
 }
 
+/** @brief прекратява програмата */
 void Schedule::exit()
 {
 	std::cout << "Exiting the program...";
 	isDone = 1;
 }
 
+/** @brief връща истина, ако потребителят е готов да излезе */
 bool Schedule::getIsDone() const
 {
 	return isDone;
 }
 
+/** @brief връща истина, ако потребителят е отворил календар */
 bool Schedule::getIsOpen() const
 {
 	return isOpen;
 }
 
+/** @brief запазва нова среща */
 void Schedule::book(const Arrangement& other)
 {
 	if (!this->overlap(other)) { 
@@ -381,7 +418,8 @@ void Schedule::book(const Arrangement& other)
 	else std::cout << "Times overlap! Can't book.\n";
 }
 
-bool Schedule::unbook(const Date& date, const MeetingTime& time) //void
+/** @brief отписва среща */
+bool Schedule::unbook(const Date& date, const MeetingTime& time) 
 {
 	for (size_t i = 0; i < size; ++i)
 	{
@@ -404,6 +442,7 @@ bool Schedule::unbook(const Date& date, const MeetingTime& time) //void
 			{
 				arr[i] = temp[i];
 			}
+			delete[] temp;
 			return true;
 		}
 	}
@@ -412,11 +451,12 @@ bool Schedule::unbook(const Date& date, const MeetingTime& time) //void
 	return false;
 }
 
+/** @brief изписва на екрана всички задължения за даден ден хронологично */
 void Schedule::agenda(const Date& date)
 {
 	bool empty = 1;
-	//std::cout << "\nAgenda for the day " << date << ":\n\n";
-	sortChronologically();
+	if(size)
+		sortChronologically();
 	for (size_t i = 0; i < size; ++i)
 	{
 		if (arr[i].getDay() == date && arr[i].getHoliday()) {
@@ -425,17 +465,17 @@ void Schedule::agenda(const Date& date)
 		}
 		else if (arr[i].getDay() == date) {
 			arr[i].print();
-			//std::cout << "________________________________________\n\n\n";
 			empty = 0;
 		}
 	}
-	if (empty) {
-		std::cout << "There's nothing planned on " << date << "." << std::endl;
-		std::cout << "This command was successful!\n";
+	if (empty || size == 0) {
+		std::cout << "There's nothing planned on " << date << "!" << std::endl;
+		//std::cout << "This command was successful!\n";
 	}
 	else std::cout << "This command was successful!\n";
 }
 
+/** @brief извиква правилната функция за промяна на ден/начално време/край/име/съобщение на среща */
 void Schedule::change(const Date& d, const Time& start, std::string option, std::string newvalue)
 {
 	if (option == "date") {
@@ -452,6 +492,7 @@ void Schedule::change(const Date& d, const Time& start, std::string option, std:
 	else std::cout << "Invalid option! Command change was unssuccessful!";
 }
 
+/** @brief променя деня на дадена среща */
 void Schedule::change(const Date& d, const Time& start, const char* option, const Date& newDate)
 {
 	assert(strcmp(option, "date") == 0);
@@ -465,6 +506,7 @@ void Schedule::change(const Date& d, const Time& start, const char* option, cons
 	arr[ind].setDate(newDate);
 }
 
+/** @brief променя началното време или края на дадена среща */
 void Schedule::change(const Date& d, const Time& start, const char* option, const Time& newTime)
 {
 	assert(strcmp(option, "starttime") == 0 || strcmp(option, "endtime") == 0);
@@ -496,6 +538,7 @@ void Schedule::change(const Date& d, const Time& start, const char* option, cons
 	}
 }
 
+/** @brief променя среща или име на дадена среща */
 void Schedule::change(const Date& d, const Time& start, const char* option, const char* str)
 {
 	assert(strcmp(option, "note") == 0 || strcmp(option, "name") == 0);
@@ -517,6 +560,7 @@ void Schedule::change(const Date& d, const Time& start, const char* option, cons
 	}
 }
 
+/** @brief изписва на екрана всички срещи, които съдържат дадена дума в себе си */
 void Schedule::find(const char* str) const
 {
 	std::cout << "All arrangements containing - \"" << str << "\" are: \n\n";
@@ -534,9 +578,10 @@ void Schedule::find(const char* str) const
 
 }
 
+/** @brief задава дадения ден като празник и изтрива всички планове от деня, ако има такива */
 void Schedule::holiday(const Date& d)
 {
-	//if i've already made plans for the day i'll remove them
+	//махам плановете от деня, ако има такива
 	for (size_t i = 0; i < size; ++i)
 	{
 		if (arr[i].getDay() == d) {
@@ -550,6 +595,7 @@ void Schedule::holiday(const Date& d)
 
 }
 
+/** @brief изписва на екрана всички дни от дадена дата до друга сортирани по заетост */
 void Schedule::busydays(const Date& from, const Date& to) const
 {
 	std::vector<Date> interval;
@@ -588,6 +634,7 @@ void Schedule::busydays(const Date& from, const Date& to) const
 	}
 }
 
+/** @brief връща дата, на която има свободно място за среща с определено време на продължителност */
 Date Schedule::findslot(const Date& from, size_t hours) const
 {
 	Date d;
@@ -600,12 +647,16 @@ Date Schedule::findslot(const Date& from, size_t hours) const
 	} while (true);
 }
 
+/** @brief връща дата, на която има свободно място за среща с определено време на продължителност, съобразено с няколко календара, 
+* взети от текстови файлове
+*/
 Date Schedule::findslotwith(const Date& from, size_t hours, std::vector<std::string> files, size_t sizeCalendars) const
 {
-	Schedule* calendars = getCalendars(files);				//ok?
+	Schedule* calendars = getCalendars(files);
 	return findslotwith(from, hours, calendars, sizeCalendars);
 }
 
+/** @brief връща дата, на която има свободно място за среща с определено време на продължителност, съобразено с няколко календара */
 Date Schedule::findslotwith(const Date& from, size_t hours, const Schedule* calendars, size_t sizeCalendars) const
 {
 	Schedule* allCals = new Schedule[sizeCalendars + 1];
@@ -617,34 +668,20 @@ Date Schedule::findslotwith(const Date& from, size_t hours, const Schedule* cale
 
 	Schedule busyHours;
 	busyHours = allBusyHours(allCals, sizeCalendars + 1);
-
+	delete[] allCals;
 	return busyHours.findslot(from, hours);
 }
 
-//remove?
-Date Schedule::findslotwithOneCal(const Date& from, size_t hours, const Schedule& cal) const
-{
-	Date d, temp;
-	temp = from;
-	do {
-		d = findslot(temp, hours);
-		if (cal.hasFreeSlot(d, hours)) {
-			if (getFreeSlot(d, hours) == cal.getFreeSlot(d, hours)) {
-				return d;
-			}
-		}
-		else {
-			temp = d;
-		}
-	} while (true);
-}
-
+/** @brief слива няколко календара от файлове в един */
 void Schedule::merge(std::vector<std::string> files, size_t n)
 {
+	//записва всички календари от съответните файлове в един масив 
 	Schedule* calendars = getCalendars(files);
+	//слива масивите
 	merge(calendars, n);
 }
 
+/** @brief слива няколко календара в един */
 void Schedule::merge(const Schedule* cals, size_t calSize)
 {
 	Arrangement newArr;
@@ -652,19 +689,15 @@ void Schedule::merge(const Schedule* cals, size_t calSize)
 	{
 		for (size_t j = 0; j < cals[i].getSize(); ++j)
 		{
-			//only works if 2 arrangements at most overlap
 			if (overlap(cals[i].getArrangement(j))) {
 				bool okay = true;
 				newArr = cals[i].getArrangement(j);
 				do {
 					std::cout << "These arrangements overlap: \n\nArrangement 1\n";
-					//cals[i].getArrangement(j).print();
 					newArr.print();
 					
 					std::cout << "\n\nArrangement 2\n";
-					//temp = getOverlappedArr(cals[i].getArrangement(j));
-					size_t ind = findIndex(getOverlappedArr(cals[i].getArrangement(j)).getDay(),
-						getOverlappedArr(cals[i].getArrangement(j)).getTime().start);
+					size_t ind = findIndex(getOverlappedArr(cals[i].getArrangement(j)).getDay(), getOverlappedArr(cals[i].getArrangement(j)).getTime().start);
 					arr[ind].print();
 
 					int num;
@@ -720,12 +753,14 @@ void Schedule::merge(const Schedule* cals, size_t calSize)
 	}
 }
 
+/** @brief предефинира operator>> */
 std::istream& operator>>(std::istream& in, Schedule& s)
 {
 	s.read(in);
 	return in;
 }
 
+/** @brief предефинира operator<< */
 std::ostream& operator<<(std::ostream& out, const Schedule& s)
 {
 	s.write(out);

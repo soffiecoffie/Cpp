@@ -1,5 +1,5 @@
-﻿#ifndef SAVECOMMAND__H
-#define SAVECOMMAND__H
+﻿#ifndef SAVECOMMAND_H
+#define SAVECOMMAND_H
 
 #include "ICommand.h"
 
@@ -10,6 +10,8 @@ class SaveCommand :	public ICommand
 
 public:
 	SaveCommand(ISchedule*);
+	/** @brief деструктор */
+	~SaveCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

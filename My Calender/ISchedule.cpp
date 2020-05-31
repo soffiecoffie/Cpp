@@ -1,6 +1,7 @@
-#include "ISchedule.h"
+﻿#include "ISchedule.h"
 #include <iostream>
 
+/** @brief виртуална функция, която изписва на екрана всички поддържани команди с кратко обяснение*/
 void ISchedule::help()
 {
 	std::cout << "\nThe following commands are supported: \n\n"

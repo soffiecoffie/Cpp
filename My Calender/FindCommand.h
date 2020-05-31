@@ -1,5 +1,5 @@
-﻿#ifndef FINDCOMMAND__H
-#define FINDCOMMAND__H
+﻿#ifndef FINDCOMMAND_H
+#define FINDCOMMAND_H
 
 #include "ICommand.h"
 
@@ -10,6 +10,8 @@ class FindCommand : public ICommand
 
 public:
 	FindCommand(ISchedule*);
+	/** @brief деструктор */
+	~FindCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

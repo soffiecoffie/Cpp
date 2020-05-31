@@ -1,5 +1,5 @@
-﻿#ifndef MERGECOMMAND__H
-#define MERGECOMMAND__H
+﻿#ifndef MERGECOMMAND_H
+#define MERGECOMMAND_H
 
 #include "ICommand.h"
 
@@ -11,6 +11,8 @@ class MergeCommand : public ICommand
 
 public:
 	MergeCommand(ISchedule*);
+	/** @brief деструктор */
+	~MergeCommand() {};
 
 	size_t getNumberOfWords() const;
 	size_t getMinNumberOfWords() const;

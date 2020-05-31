@@ -46,6 +46,7 @@ size_t Arrangement::getLength() const
 /** @brief задава ново име */
 void Arrangement::setName(const char* _name)
 {
+	delete[] name;
 	name = new char[strlen(_name) + 1];
 	strcpy(name, _name);
 }
@@ -110,8 +111,6 @@ void Arrangement::print() const
 Arrangement& Arrangement::operator=(const Arrangement& other)
 {
 	if (this != &other) {
-		delete[] name;	
-		delete[] note;
 	
 		setHoliday(other.getHoliday());
 
@@ -144,7 +143,6 @@ std::istream& Arrangement::read(std::istream& in)
 		day.read(in);
 	}
 	else {
-//		holiday = false;
 		setHoliday(false);
 
 		setName(temp);
@@ -159,6 +157,7 @@ std::istream& Arrangement::read(std::istream& in)
 		in >> time.end;
 	}
 
+	delete[] temp;
 	return in;
 }
 
@@ -211,6 +210,7 @@ std::istream& Arrangement::readFromBin(std::istream& in)
 
 	time.end.read(in);
 
+	delete[] temp;
 	return in;
 }
 

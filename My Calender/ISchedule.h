@@ -22,7 +22,7 @@ public:
 	virtual ~ISchedule() = 0 {};
 
 	virtual void book(const Arrangement&) = 0;
-	virtual bool unbook(const Date&, const MeetingTime&) = 0; //void
+	virtual bool unbook(const Date&, const MeetingTime&) = 0; 
 	virtual void holiday(const Date&) = 0;
 	virtual void busydays(const Date&, const Date&) const = 0;
 	virtual void change(const Date&, const Time&, std::string, std::string) = 0;

@@ -1,5 +1,5 @@
-﻿#ifndef FINDSLOTWITHCOMMAND__H
-#define FINDSLOTWITHCOMMAND__H
+﻿#ifndef FINDSLOTWITHCOMMAND_H
+#define FINDSLOTWITHCOMMAND_H
 
 #include "ICommand.h"
 
@@ -11,6 +11,8 @@ class FindslotwithCommand : public ICommand
 
 public:
 	FindslotwithCommand(ISchedule*);
+	/** @brief деструктор */
+	~FindslotwithCommand() {};
 
 	size_t getNumberOfWords() const;
 	size_t getMinNumberOfWords() const;

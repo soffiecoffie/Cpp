@@ -1,17 +1,20 @@
-#include "FindslotCommand.h"
+﻿#include "FindslotCommand.h"
 #include "Date.h"
 #include <iostream>
 
+/** @brief конструктор с параметър*/
 FindslotCommand::FindslotCommand(ISchedule* _s)
 {
 	s = _s;
 }
 
+/** @brief връща броя на думите, които са необходими за тази команда */
 size_t FindslotCommand::getNumberOfWords() const
 {
 	return numOfWords;
 }
 
+/** @brief извиква командата findslot */
 void FindslotCommand::execute(std::string input) const
 {
 	if (s->getIsOpen()) {
@@ -27,6 +30,7 @@ void FindslotCommand::execute(std::string input) const
 		std::cout << "You can't use this command until you open a file!\n";
 }
 
+/** @brief връща символен низ от името на командата */
 std::string FindslotCommand::toString() const
 {
 	return "findslot";

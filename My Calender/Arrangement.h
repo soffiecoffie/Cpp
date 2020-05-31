@@ -19,10 +19,15 @@ public:
 	Arrangement(const Arrangement&) = delete;
 	~Arrangement();
 
+	/** @brief връща деня на срещата */
 	Date getDay() const { return day; };
+	/** @brief връща времето на срещата */
 	MeetingTime getTime() const { return time; };
+	/** @brief връща името от срещата */
 	char* getName() const { return name; };
+	/** @brief връща съобщението на срещата */
 	char* getNote() const { return note; };
+	/** @brief връща дали деня на срещата е празник */
 	bool getHoliday() const { return holiday; };
 	size_t getLength() const;
 

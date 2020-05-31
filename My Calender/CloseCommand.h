@@ -10,6 +10,8 @@ class CloseCommand : public ICommand
 
 public:
 	CloseCommand(ISchedule* _s);
+	/** @brief деструктор */
+	~CloseCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

@@ -1,5 +1,5 @@
-﻿#ifndef UNBOOKCOMMAND__H
-#define UNBOOKCOMMAND__H
+﻿#ifndef UNBOOKCOMMAND_H
+#define UNBOOKCOMMAND_H
 
 #include "ICommand.h"
 
@@ -10,6 +10,8 @@ class UnbookCommand : public ICommand
 
 public:
 	UnbookCommand(ISchedule*);
+	/** @brief деструктор */
+	~UnbookCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

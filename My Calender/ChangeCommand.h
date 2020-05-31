@@ -1,5 +1,5 @@
-﻿#ifndef CHANGECOMMAND__H
-#define CHANGECOMMAND__H
+﻿#ifndef CHANGECOMMAND_H
+#define CHANGECOMMAND_H
 
 #include "ICommand.h"
 
@@ -11,6 +11,8 @@ class ChangeCommand : public ICommand
 
 public:
 	ChangeCommand(ISchedule*);
+	/** @brief деструктор */
+	~ChangeCommand() {};
 
 	size_t getNumberOfWords() const;
 	size_t getMinNumberOfWords() const;

@@ -1,5 +1,5 @@
-﻿#ifndef FINDSLOTCOMMAND__H
-#define FINDSLOTCOMMAND__H
+﻿#ifndef FINDSLOTCOMMAND_H
+#define FINDSLOTCOMMAND_H
 
 #include "ICommand.h"
 
@@ -10,6 +10,8 @@ class FindslotCommand : public ICommand
 
 public:
 	FindslotCommand(ISchedule*);
+	/** @brief деструктор */
+	~FindslotCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

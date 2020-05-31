@@ -1,10 +1,15 @@
-﻿#ifndef UTILS__H
-#define UTILS__H
+﻿#ifndef UTILS_H
+#define UTILS_H
 
 #include <string>
 
-size_t getNumOfWords(std::string s);
+//Полезни функции:
 
+size_t getNumOfWords(std::string);
+std::string getFistWord(std::string);
+size_t getFirstSpaceInd(std::string);
+std::string getWord(size_t, const std::string&);
+std::string getStringAfterWord(size_t, const std::string&);
 
 
 

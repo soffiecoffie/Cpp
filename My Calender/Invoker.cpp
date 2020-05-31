@@ -1,4 +1,4 @@
-#include "Invoker.h"
+﻿#include "Invoker.h"
 #include "CmdValidator.h"
 #include "OpenCommand.h"
 #include "SaveCommand.h"
@@ -18,9 +18,11 @@
 #include "ChangeCommand.h"
 #include <iostream>
 
+
+/** @brief конструктор с параметър*/
 Invoker::Invoker(ISchedule* _s)
 {
-	commands.push_back(new OpenCommand(_s));// , new HelpCommand(_s));
+	commands.push_back(new OpenCommand(_s));
 	commands.push_back(new SaveCommand(_s));
 	commands.push_back(new SaveAsCommand(_s));
 	commands.push_back(new CloseCommand(_s));
@@ -38,6 +40,16 @@ Invoker::Invoker(ISchedule* _s)
 	commands.push_back(new ChangeCommand(_s));
 }
 
+/** @brief деструктор */
+Invoker::~Invoker()
+{
+	for (size_t i = 0; i < commands.size(); ++i)
+	{
+		delete commands[i];
+	}
+}
+
+/** @brief извиква желаната команда от подаден низ */
 void Invoker::executeCmd(std::string input)
 {
 	for (ICommand* cmd : commands) {

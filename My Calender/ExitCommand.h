@@ -11,6 +11,8 @@ class ExitCommand :	public ICommand
 
 public:
 	ExitCommand(ISchedule*);
+	/** @brief деструктор */
+	~ExitCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

@@ -1,5 +1,5 @@
-﻿#ifndef HOLIDAYCOMMAND__H
-#define HOLIDAYCOMMAND__H
+﻿#ifndef HOLIDAYCOMMAND_H
+#define HOLIDAYCOMMAND_H
 
 #include "ICommand.h"
 
@@ -10,6 +10,8 @@ class HolidayCommand : public ICommand
 
 public:
 	HolidayCommand(ISchedule*);
+	/** @brief деструктор */
+	~HolidayCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

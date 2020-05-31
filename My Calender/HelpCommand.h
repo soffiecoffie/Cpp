@@ -11,6 +11,8 @@ private:
 
 public:
 	HelpCommand(ISchedule*);
+	/** @brief деструктор */
+	~HelpCommand() {};
 
 	size_t getNumberOfWords() const;
 	void execute(std::string) const;

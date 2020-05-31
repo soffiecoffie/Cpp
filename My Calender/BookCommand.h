@@ -1,5 +1,5 @@
-﻿#ifndef BOOKCOMMAND__H
-#define BOOKCOMMAND__H
+﻿#ifndef BOOKCOMMAND_H
+#define BOOKCOMMAND_H
 
 #include "ICommand.h"
 
@@ -11,6 +11,8 @@ class BookCommand :	public ICommand
 
 public:
 	BookCommand(ISchedule*);
+	/** @brief деструктор */
+	~BookCommand() {};
 
 	size_t getNumberOfWords() const;
 	size_t getMinNumberOfWords() const;
