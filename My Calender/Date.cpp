@@ -1,4 +1,4 @@
-#ifndef DATE_CPP
+﻿#ifndef DATE_CPP
 #define DATE_CPP
 
 #include <iostream>
@@ -6,12 +6,12 @@
 #include <fstream>
 #include "Date.h"
 
-//конструктор по подразбиране
+/** @brief конструктор по подразбиране*/
 Date::Date() : year(2020), month(1), day(1)
 {
 }
 
-//конструктор с параметри
+/** @brief конструктор с параметри */
 Date::Date(int _year, int _month, int _day)
 {
 	this->setYear(_year);
@@ -19,55 +19,55 @@ Date::Date(int _year, int _month, int _day)
 	this->setDay(_day);
 }
 
-//връща годината
+/** @brief връща годината */
 int Date::getYear() const
 {
 	return year;
 }
 
-//връща месеца
+/** @brief връща месеца */
 int Date::getMonth() const
 {
 	return month;
 }
 
-//връща деня
+/** @brief връща деня */
 int Date::getDay() const
 {
 	return day;
 }
 
-//променя годината
+/** @brief променя годината */
 void Date::setYear(int _year)
 {
-	//проверява дали подадената година е валидна и ако не е прекратява програмата
-	assert(_year > 1920 && _year < 2100);							//is the time frame adequate
+	//проверява дали подадената година е валидна и ако не е 
+	assert(_year > 2010 && _year < 2040);
 	this->year = _year;
 }
 
-//променя месеца
+/** @brief променя месеца */
 void Date::setMonth(int _month)
 {
-	//проверява дали подаденият месец е валиден и ако не е прекратява програмата
+	//проверява дали подаденият месец е валиден и ако не е спира изпълнението на програмата
 	assert(_month > 0 && _month < 13);
 	this->month = _month;
 }
 
-//променя деня
+/** @brief променя деня */
 void Date::setDay(int _day)
 {
-	//проверява дали подаденият ден е валиден и ако не е прекратява програмата
-	assert(_day > 0 && _day < maxDays());
+	//проверява дали подаденият ден е валиден и ако не е спира изпълнението на програмата
+	assert(_day > 0 && _day <= maxDays());
 	this->day = _day;
 }
 
-//принтира датата на екрана
+/** @brief принтира датата на екрана */
 void Date::print() const
 {
 	this->write(std::cout);
 }
 
-//връща истина ако датата, с която сме извикали тази функция е по-ранна от подадената
+/** @brief връща истина ако датата, с която сме извикали тази функция е преди подадената */
 bool Date::operator<(const Date& other) const
 {
 	if (this->year < other.year) return true;
@@ -77,13 +77,19 @@ bool Date::operator<(const Date& other) const
 	else return this->day < other.day;
 }
 
-//връща истина ако датите съвпадат
+/** @brief връща истина ако датите съвпадат */
 bool Date::operator==(const Date& other) const
 {
 	return day == other.day && month == other.month && year == other.year;
 }
 
-//връща истина ако годината е високосна
+/** @brief връща истина ако датата от ляво е преди или в същия ден като датата от дясно */
+bool Date::operator<=(const Date& other) const
+{
+	return operator<(other) || operator==(other);
+}
+
+/** @brief връща истина ако годината е високосна */
 bool Date::isLeap() const
 {
 	if (year % 4 == 0)
@@ -91,9 +97,9 @@ bool Date::isLeap() const
 	return false;
 }
 
-//връща максималният брой дни за съответния месец
+/** @brief връща максималният брой дни за съответния месец */
 int Date::maxDays() const
-{												//is this the best optimization?
+{
 	switch (this->month) {
 	case 2:
 		return (isLeap()) ? 29 : 28;
@@ -113,7 +119,44 @@ int Date::maxDays() const
 	}
 }
 
-//прочита дата
+/** @brief връща датата на следващия ден */
+Date Date::getNextDay() const
+{
+	Date result;
+	if ((getDay() + 1) <= maxDays()) result = Date(getYear(), getMonth(), getDay() + 1);
+	else {
+		if (getMonth() == 12) {
+			result = Date(getYear() + 1, 1, 1);
+		}
+		else {
+			result = Date(getYear(), getMonth() + 1, 1);
+		}
+	}
+	return result;
+}
+
+/** @brief връща датата от подадения низ */
+Date Date::stringToDate(std::string str)
+{
+	Date result;
+
+	std::string year = str; 
+	year.erase(year.begin() + 4, year.end());
+	result.setYear(std::stoi(year));
+
+	std::string month = str;
+	month.erase(month.begin(), month.begin() + 5);
+	month.erase(month.begin() + 2, month.end());
+	result.setMonth(std::stoi(month));
+	
+	std::string day = str;
+	day.erase(day.begin(), day.begin() + 8);
+	result.setDay(std::stoi(day));
+	
+	return result;
+}
+
+/** @brief прочита дата от файл или стандартния вход */
 std::istream& Date::read(std::istream& in)
 {
 	int num;
@@ -131,7 +174,7 @@ std::istream& Date::read(std::istream& in)
 	return in;
 }
 
-//записва датата
+/** @brief записва датата във файл или я извежда на екрана чрез стандартния изход */
 std::ostream& Date::write(std::ostream& out) const
 {
 	out << this->year << '-';
@@ -146,14 +189,14 @@ std::ostream& Date::write(std::ostream& out) const
 	return out;
 }
 
-//предефинира оператор >> и го прочита 
+/** @brief предефинира оператор >> за дати */
 std::istream& operator>>(std::istream& in, Date& d)
 {
 	d.read(in);
 	return in;
 }
 
-//предефинира оператор << и го записва
+/** @brief предефинира оператор << за дати */
 std::ostream& operator<<(std::ostream& out, const Date& d)
 {
 	d.write(out);

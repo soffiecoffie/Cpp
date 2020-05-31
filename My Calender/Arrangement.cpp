@@ -1,31 +1,36 @@
-#include <cstring>
+﻿#include <cstring>
 #include <cassert>
 #include <iostream>
 #include <fstream>
 #include "Arrangement.h"
 
-Arrangement::Arrangement(const char* _name, const char* _note, const Date& _day, const MeetingTime& _time) :day(_day), time(_time) //is this ok? op=?copy con?
+/** @brief конструктор с параметри*/
+Arrangement::Arrangement(const char* _name, const char* _note, const Date& _day, const MeetingTime& _time) :day(_day), time(_time)
 {
 	setName(_name);
 	setNote(_note);
 }
 
+/** @brief конструктор с параметри*/
 Arrangement::Arrangement(const Date& d, const MeetingTime& m) : name(nullptr), note(nullptr)
 {
 	time = m;
 	day = d;
 }
 
+/** @brief конструктор с параметри*/
 Arrangement::Arrangement(bool h, const Date& d): holiday(h), day(d), name(nullptr), note(nullptr)
 {
 }
 
+/** @brief деструктор */
 Arrangement::~Arrangement()
 {
 	delete[] this->name;
 	delete[] this->note;
 }
 
+/** @brief връща дължината на срещата в минути*/
 size_t Arrangement::getLength() const
 {
 	if (!getHoliday()) {
@@ -38,42 +43,48 @@ size_t Arrangement::getLength() const
 	return 0;
 }
 
+/** @brief задава ново име */
 void Arrangement::setName(const char* _name)
 {
-	//delete[] name;
 	name = new char[strlen(_name) + 1];
 	strcpy(name, _name);
 }
 
+/** @brief задава ново съобщение */
 void Arrangement::setNote(const char* _note)
 {
-	//delete[] name;
+	delete[] note;
 	note = new char[strlen(_note) + 1];
 	strcpy(note, _note);
 }
 
+/** @brief задава нова стойност на булевата променлива, която казва дали някой ден е празник */
 void Arrangement::setHoliday(bool h)
 {
 	holiday = h;
 }
 
+/** @brief задава нова дата */
 void Arrangement::setDate(const Date& d)
 {
 	day = d;
 }
 
-void Arrangement::setStartTime(const Time& t)
+/** @brief задава ново начално време */
+void Arrangement::setStartTime(const Time& newtime)
 {
-	assert(t < time.end);
-	time.start = t;
+	assert(newtime < time.end);
+	time.start = newtime;
 }
 
-void Arrangement::setEndTime(const Time& t)
+/** @brief задава ново време за края на среща */
+void Arrangement::setEndTime(const Time& newtime)
 {
-	assert(time.start < t);
-	time.end = t;
+	assert(time.start < newtime);
+	time.end = newtime;
 }
 
+/** @brief извежда срещата на екрана */
 void Arrangement::print() const
 {
 	if (!holiday) {
@@ -95,16 +106,16 @@ void Arrangement::print() const
 	}
 }
 
+/** @brief предефиниция на оператор= за срещи*/
 Arrangement& Arrangement::operator=(const Arrangement& other)
 {
 	if (this != &other) {
-		delete[] name;	//okay?
+		delete[] name;	
 		delete[] note;
 	
 		setHoliday(other.getHoliday());
 
 		//when other's name/note is nullptr setName/Note throw exception because i can't strlen(nullptr)
-		//therefore i check for nullptr before sending it to the setter
 		if (other.getName() != nullptr) setName(other.getName());
 		else name = nullptr;
 
@@ -117,6 +128,7 @@ Arrangement& Arrangement::operator=(const Arrangement& other)
 	return *this;
 }
 
+/** @brief прочита среща от файл или от стандартния вход */
 std::istream& Arrangement::read(std::istream& in)
 {
 	char* temp = new char[1024];
@@ -150,6 +162,7 @@ std::istream& Arrangement::read(std::istream& in)
 	return in;
 }
 
+/** @brief записва среща във файл или я извежда на екрана */
 std::ostream& Arrangement::write(std::ostream& out) const
 {
 	if (!holiday) {
@@ -169,6 +182,7 @@ std::ostream& Arrangement::write(std::ostream& out) const
 	return out;
 }
 
+/** @brief прочита среща от бинарен файл */
 std::istream& Arrangement::readFromBin(std::istream& in)
 {
 	int num;
@@ -178,10 +192,9 @@ std::istream& Arrangement::readFromBin(std::istream& in)
 	in.read(temp, num);
 	temp[num] = '\0';
 
-	//std::cout << temp;
 	if (num == 3 && strcmp(temp, "(*)") == 0) {
 		holiday = true;
-		day.read(in);// FromBin(in);
+		day.read(in);
 		return in;
 	}
 
@@ -192,7 +205,7 @@ std::istream& Arrangement::readFromBin(std::istream& in)
 	temp[num] = '\0';
 	setNote(temp);
 
-	day.read(in);// FromBin(in);
+	day.read(in);
 
 	time.start.read(in);
 
@@ -201,6 +214,7 @@ std::istream& Arrangement::readFromBin(std::istream& in)
 	return in;
 }
 
+/** @brief записва среща в бинарен файл */
 std::ostream& Arrangement::writeToBin(std::ostream& out) const
 {
 	if (!holiday) {
@@ -213,7 +227,7 @@ std::ostream& Arrangement::writeToBin(std::ostream& out) const
 		out.write(note, strlen(note));
 		out << '\n';
 
-		day.write(out);// ToBin(out);
+		day.write(out);
 		out << '\n';
 
 		time.start.write(out);
@@ -231,12 +245,14 @@ std::ostream& Arrangement::writeToBin(std::ostream& out) const
 	return out;
 }
 
+/** @brief предефиниция на оператор>> за срещи*/
 std::istream& operator>>(std::istream& in, Arrangement& a)
 {
 	a.read(in);
 	return in;
 }
 
+/** @brief предефиниция на оператор<< за срещи*/
 std::ostream& operator<<(std::ostream& out, const Arrangement& a)
 {
 	a.write(out);

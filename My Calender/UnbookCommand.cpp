@@ -25,7 +25,8 @@ void UnbookCommand::execute(std::string input) const
 		start = start.stringToTime(starttime);
 		end = end.stringToTime(endtime);
 
-		s->unbook(day, MeetingTime(start, end));
+		if(s->unbook(day, MeetingTime(start, end)))
+			std::cout << "Successfully booked an appointment!\n";
 	}
 	else
 		std::cout << "You can't use this command until you open a file!\n";

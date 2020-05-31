@@ -1,9 +1,7 @@
-#include "Schedule.h"
+﻿#include "Schedule.h"
 #include "CmdValidator.h"
 #include <iostream>
-#include <string>
 #include <cassert>
-#include <vector>
 
 //увеличава големината в зависимост от подадената големина
 void Schedule::addSize(size_t n)
@@ -219,7 +217,7 @@ Schedule Schedule::allBusyHours(const Schedule* cal, size_t calSize) const
 	{
 		for (size_t j = 0; j < cal[i].getSize(); ++j)
 		{
-			arrs[spot] = cal[i].getArrangement(j);
+			arrs[spot++] = cal[i].getArrangement(j);
 		}
 
 	}
@@ -248,6 +246,19 @@ void Schedule::print() const
 		std::cout << "Arrangement " << i + 1 << '\n';
 		arr[i].print();
 	}
+}
+
+Schedule* Schedule::getCalendars(std::vector<std::string> files) const
+{
+	Schedule* calendars = new Schedule[files.size()];
+	char* temp = new char[20];
+	for (size_t i = 0; i < files.size(); i++)
+	{
+		std::ifstream in(files[i].c_str());
+		calendars[i].read(in);
+		in.close();
+	}
+	return calendars;
 }
 
 std::istream& Schedule::read(std::istream& in)
@@ -296,6 +307,7 @@ void Schedule::open(std::string input)
 		//fills the file with the basic calendar.txt
 		write(out);				 //yay or nay? 
 		setUserFile(input);		 //creates a new file if it gets saved, update - not anymore
+		isOpen = 1;
 	}
 	else {
 		read(in);
@@ -369,7 +381,7 @@ void Schedule::book(const Arrangement& other)
 	else std::cout << "Times overlap! Can't book.\n";
 }
 
-void Schedule::unbook(const Date& date, const MeetingTime& time)
+bool Schedule::unbook(const Date& date, const MeetingTime& time) //void
 {
 	for (size_t i = 0; i < size; ++i)
 	{
@@ -392,19 +404,18 @@ void Schedule::unbook(const Date& date, const MeetingTime& time)
 			{
 				arr[i] = temp[i];
 			}
-
-			std::cout << "Successfully unbooked an appointment!\n";
-			return;
+			return true;
 		}
 	}
-	std::cout << "Unbooking was unsuccessful! \nThere isn't an existing appointment on " << date
+	std::cout << "Nothing was unbooked! \nThere isn't an existing appointment on " << date
 		<< " from " << time.start << " to " << time.end << std::endl;
+	return false;
 }
 
 void Schedule::agenda(const Date& date)
 {
 	bool empty = 1;
-	std::cout << "Agenda for the day " << date << ":\n\n";
+	//std::cout << "\nAgenda for the day " << date << ":\n\n";
 	sortChronologically();
 	for (size_t i = 0; i < size; ++i)
 	{
@@ -414,63 +425,97 @@ void Schedule::agenda(const Date& date)
 		}
 		else if (arr[i].getDay() == date) {
 			arr[i].print();
-			std::cout << "________________________________________\n\n\n";
+			//std::cout << "________________________________________\n\n\n";
 			empty = 0;
 		}
 	}
 	if (empty) {
 		std::cout << "There's nothing planned on " << date << "." << std::endl;
+		std::cout << "This command was successful!\n";
+	}
+	else std::cout << "This command was successful!\n";
+}
+
+void Schedule::change(const Date& d, const Time& start, std::string option, std::string newvalue)
+{
+	if (option == "date") {
+		Date day = day.stringToDate(newvalue);
+		change(d, start, option.c_str(), day);
+	}
+	else if (option == "starttime" || option == "endtime") {
+		Time t = t.stringToTime(newvalue);
+		change(d, start, option.c_str(), t);
+	}
+	else if (option == "note" || option == "name") {
+		change(d, start, option.c_str(), newvalue.c_str());
+	}
+	else std::cout << "Invalid option! Command change was unssuccessful!";
+}
+
+void Schedule::change(const Date& d, const Time& start, const char* option, const Date& newDate)
+{
+	assert(strcmp(option, "date") == 0);
+	int ind = findIndex(d, start);
+	if (ind == -1) {
+		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
+		std::cout << "Nothing has been changed!\n";
+		return;
+	}
+
+	arr[ind].setDate(newDate);
+}
+
+void Schedule::change(const Date& d, const Time& start, const char* option, const Time& newTime)
+{
+	assert(strcmp(option, "starttime") == 0 || strcmp(option, "endtime") == 0);
+
+	int ind = findIndex(d, start);
+	if (ind == -1) {
+		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
+		std::cout << "Nothing has been changed!\n";
+		return;
+	}
+
+	if (strcmp(option, "starttime") == 0) {
+		if (newTime < arr[ind].getTime().end && !(overlapOthers(Arrangement(d, MeetingTime(newTime, arr[ind].getTime().end)), ind))) {
+			arr[ind].setStartTime(newTime);
+			std::cout << "Successfully changed the " << option << "!\n";
+		}
+		else {
+			std::cout << "The arrangement on " << d << " at " << start << " can't start at " << newTime << "!\n\n";
+			std::cout << "Nothing has been changed!\n";
+		}
+	}
+	else if (arr[ind].getTime().start < newTime && !(overlapOthers(Arrangement(d, MeetingTime(arr[ind].getTime().start, newTime)), ind))) {
+		arr[ind].setEndTime(newTime);
+		std::cout << "Successfully changed the " << option << "!\n";
+	}
+	else {
+		std::cout << "The arrangement on " << d << " at " << start << " can't end at " << newTime << "!\n\n";
+		std::cout << "Nothing has been changed!\n";
 	}
 }
 
-//void Schedule::change(const Date& d, const Time& start, const char* option, const Date& newDate)
-//{
-//	assert(strcmp(option, "date") == 0);
-//	int ind = findIndex(d, start);
-//	if (ind == -1) {
-//		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
-//		return;
-//	}
-//
-//	arr[ind].setDate(newDate);
-//}
-//
-//void Schedule::change(const Date& d, const Time& start, const char* option, const Time& newTime)
-//{
-//	assert(strcmp(option, "starttime") == 0 || strcmp(option, "endtime") == 0);
-//
-//	int ind = findIndex(d, start);
-//	if (ind == -1) {
-//		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
-//		return;
-//	}
-//
-//	if (strcmp(option, "starttime") == 0) {
-//		if (newTime < arr[ind].getTime().end && !(overlapOthers(Arrangement(d, MeetingTime(newTime, arr[ind].getTime().end)), ind)))
-//			arr[ind].setStartTime(newTime);
-//		else std::cout << "The arrangement on " << d << " at " << start << " can't start at " << newTime << "!\n\n";
-//	}
-//	else if (arr[ind].getTime().start < newTime && !(overlapOthers(Arrangement(d, MeetingTime(arr[ind].getTime().start, newTime)), ind)))
-//		arr[ind].setEndTime(newTime);
-//	else std::cout << "The arrangement on " << d << " at " << start << " can't end at " << newTime << "!\n\n";
-//
-//}
-//
-//void Schedule::change(const Date& d, const Time& start, const char* option, const char* str)
-//{
-//	assert(strcmp(option, "note") == 0 || strcmp(option, "name") == 0);
-//
-//	int ind = findIndex(d, start);
-//	if (ind == -1) {
-//		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
-//		return;
-//	}
-//
-//	if (strcmp(option, "note") == 0) {
-//		arr[ind].setNote(str);
-//	}
-//	else arr[ind].setName(str);
-//}
+void Schedule::change(const Date& d, const Time& start, const char* option, const char* str)
+{
+	assert(strcmp(option, "note") == 0 || strcmp(option, "name") == 0);
+
+	int ind = findIndex(d, start);
+	if (ind == -1) {
+		std::cout << "There isn't anything planned on " << d << " at " << start << "!\n\n";
+		std::cout << "Nothing has been changed!\n";
+		return;
+	}
+
+	if (strcmp(option, "note") == 0) {
+		std::cout << "Successfully changed the " << option << "!\n";
+		arr[ind].setNote(str);
+	}
+	else {
+		arr[ind].setName(str);
+		std::cout << "Successfully changed the " << option << "!\n";
+	}
+}
 
 void Schedule::find(const char* str) const
 {
@@ -485,7 +530,7 @@ void Schedule::find(const char* str) const
 		}
 	}
 
-	if (empty) std::cout << "------NONE------";
+	if (empty) std::cout << "------NONE------\n\n";
 
 }
 
@@ -518,10 +563,10 @@ void Schedule::busydays(const Date& from, const Date& to) const
 
 	std::cout << "All days from " << from << " to " << to << " sorted by busyness: \n\n";
 	
-	size_t* ind = new size_t[interval.size()];
+	std::vector<size_t> ind;
 	for (size_t i = 0; i < interval.size(); ++i)
 	{
-		ind[i] = getBusyMinutes(interval[i]);
+		ind.push_back(getBusyMinutes(interval[i]));
 	}
 
 	int max;
@@ -529,7 +574,7 @@ void Schedule::busydays(const Date& from, const Date& to) const
 	{
 		max = i;
 		for (size_t j = i + 1; j < interval.size(); ++j) {
-			if (ind[i] < ind[j]) {
+			if (ind[max] < ind[j]) {
 				max = j;
 			}
 		}
@@ -553,6 +598,12 @@ Date Schedule::findslot(const Date& from, size_t hours) const
 		}
 		else d = d.getNextDay();
 	} while (true);
+}
+
+Date Schedule::findslotwith(const Date& from, size_t hours, std::vector<std::string> files, size_t sizeCalendars) const
+{
+	Schedule* calendars = getCalendars(files);				//ok?
+	return findslotwith(from, hours, calendars, sizeCalendars);
 }
 
 Date Schedule::findslotwith(const Date& from, size_t hours, const Schedule* calendars, size_t sizeCalendars) const
@@ -588,6 +639,12 @@ Date Schedule::findslotwithOneCal(const Date& from, size_t hours, const Schedule
 	} while (true);
 }
 
+void Schedule::merge(std::vector<std::string> files, size_t n)
+{
+	Schedule* calendars = getCalendars(files);
+	merge(calendars, n);
+}
+
 void Schedule::merge(const Schedule* cals, size_t calSize)
 {
 	Arrangement newArr;
@@ -600,7 +657,7 @@ void Schedule::merge(const Schedule* cals, size_t calSize)
 				bool okay = true;
 				newArr = cals[i].getArrangement(j);
 				do {
-					std::cout << "These arrangements overlap: \n\n Arrangement 1\n";
+					std::cout << "These arrangements overlap: \n\nArrangement 1\n";
 					//cals[i].getArrangement(j).print();
 					newArr.print();
 					
@@ -627,25 +684,35 @@ void Schedule::merge(const Schedule* cals, size_t calSize)
 					Time newEnd;
 					std::cout << "Enter your preffered end time for the arrangement: \n";
 					std::cin >> newEnd;
-
-					//if (num == 1) {
-					//	newArr = cals[i].getArrangement(j);
-					//}
-					//else {
+					
+					std::cin.ignore(1);
+					
 					if(num==2){
-						newArr = arr[ind]; //temp;
+						newArr = arr[ind]; 
 						unbook(arr[ind].getDay(), arr[ind].getTime());
 						book(cals[i].getArrangement(j));
 					}
+					else {
+						newArr = cals[i].getArrangement(j);
+					}
 					newArr.setDate(newDate);
-					newArr.setStartTime(newStart);
-					newArr.setEndTime(newEnd);
+
+					if (newArr.getTime().end < newStart) {		//заради assert-а в set-ърите
+						newArr.setEndTime(newEnd);
+						newArr.setStartTime(newStart);
+					}
+					else {
+						newArr.setStartTime(newStart);
+						newArr.setEndTime(newEnd);
+					}
 
 					if (overlap(newArr)) {
 						okay = false;
 					}
-					else okay = true;
-
+					else {
+						okay = true;
+						book(newArr);
+					}
 				} while (!okay);
 			}
 			else book(cals[i].getArrangement(j));
