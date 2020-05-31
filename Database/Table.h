@@ -36,6 +36,7 @@ public:
 
 	void printFromTo(size_t, size_t) const;
 	void printRows(size_t, size_t) const;
+	void printRowAt(size_t) const;
 
 	void setCol(IColumn* [], size_t);
 	void setFileName(const std::string&);

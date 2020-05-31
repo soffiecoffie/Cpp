@@ -31,6 +31,7 @@ public:
 
 	virtual void printFromTo(size_t, size_t) const = 0;
 	virtual void printRows(size_t, size_t) const = 0;
+	virtual void printRowAt(size_t) const = 0;
 };
 
 #endif

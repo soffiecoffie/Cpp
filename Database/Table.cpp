@@ -271,6 +271,18 @@ void Table::printRows(size_t start, size_t end) const
 	}
 }
 
+/** @brief принтира реда на даден индекс */
+void Table::printRowAt(size_t ind) const
+{
+	printTableLine(std::cout);
+	for (size_t j = 0; j < size; ++j)
+	{
+		cols[j]->printCellContents(ind, std::cout);
+	}
+	std::cout << "|\n";
+
+}
+
 /** @brief задава стойности на колоните */
 void Table::setCol(IColumn* arr[], size_t s)
 {
@@ -306,6 +318,7 @@ void Table::setFileName(const std::string& str)
 	filename = str;
 }
 
+/** @brief задава нов име */
 void Table::setName(const std::string& newName)
 {
 	name = newName;

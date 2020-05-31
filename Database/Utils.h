@@ -12,6 +12,6 @@ std::ostream& printMany(const char*, size_t, std::ostream&);
 bool isSpaceBetweenWords(std::string, size_t);
 std::string getWord(size_t, const std::string&);
 size_t numOfWords(std::string);
-
+bool hasStr(const std::string&, const std::string&);
 
 #endif 

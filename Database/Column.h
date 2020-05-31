@@ -20,7 +20,6 @@ private:
 
 public:
 	Column(const std::string&, const std::string&, const T*, size_t);
-	Column(const std::string&, const std::string&, const T**, size_t);
 	Column(const char*);
 	Column(const std::string&, const std::string&, size_t);
 	Column(const Column&) = delete;

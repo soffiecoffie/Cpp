@@ -44,7 +44,6 @@ public:
 	void describe(std::string) const;
 	void myExport(std::string, std::string) const;
 	void print(std::string);
-	void select(size_t, std::string, std::string);
 	void rename(std::string, std::string);
 	
 	void out();

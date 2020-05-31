@@ -87,3 +87,31 @@ size_t numOfWords(std::string s)
 	}
 	return counter + 1;
 }
+
+/** @brief проверява дали даден низ се намира в друг */
+bool hasStr(const std::string& text, const std::string& str)
+{
+	int count = 0;
+	int ind;
+	size_t i = 0;
+	if (str.size() > text.size()) return false;
+
+	for (size_t j = 0; j < str.size(); )
+	{
+		if (i >= text.size()) break;
+		if (count == 0) ind = i;
+		if (text[i] == str[j]) {
+			++count;
+			if (count == str.size()) return true;
+			if (count == 1) ind = i;
+			++i;
+			++j;
+		}
+		else {
+			count = 0;
+			i = ++ind;
+			j = 0;
+		}
+	}
+	return false;
+}
