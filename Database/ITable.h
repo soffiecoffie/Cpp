@@ -1,0 +1,36 @@
+#ifndef ITable_H
+#define ITable_H
+
+//#include "IColumn.h"
+#include "Column.h"
+#include <string>
+
+class ITable
+{
+public:
+	virtual ~ITable() = 0 {};
+
+	virtual std::ostream& print(std::ostream& out) const = 0;
+
+	virtual std::istream& read(std::istream&) = 0;
+	virtual std::ostream& write(std::ostream&) const = 0;
+
+	virtual size_t getSize() const = 0;
+	virtual std::string getFileName() const = 0;
+	virtual std::string getName() const = 0;
+	virtual IColumn** getCols() const = 0;
+	virtual IColumn* getColumnByName(std::string) const = 0;
+	virtual size_t getMaxRowSize() const = 0;
+
+	virtual void addCol(std::string, std::string) = 0;
+
+	virtual void setFileName(const std::string&) = 0;
+	virtual void setName(const std::string&) = 0;
+
+
+	virtual void printFromTo(size_t, size_t) const = 0;
+	virtual void printRows(size_t, size_t) const = 0;
+	//add AddCol func
+};
+
+#endif
