@@ -2,7 +2,7 @@
 #define SUITS_H
 
 enum class Suits {
-	CLUBS, DIAMONDS, HEARTS, SPADES 
+	CLUBS = 0, DIAMONDS, HEARTS, SPADES 
 };
 
 #endif
