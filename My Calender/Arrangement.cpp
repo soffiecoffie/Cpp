@@ -107,14 +107,13 @@ void Arrangement::print() const
 	}
 }
 
-/** @brief предефиниция на оператор= за срещи*/
+/** @brief предефиниция на оператор = за срещи*/
 Arrangement& Arrangement::operator=(const Arrangement& other)
 {
 	if (this != &other) {
 	
 		setHoliday(other.getHoliday());
 
-		//when other's name/note is nullptr setName/Note throw exception because i can't strlen(nullptr)
 		if (other.getName() != nullptr) setName(other.getName());
 		else name = nullptr;
 
@@ -136,22 +135,28 @@ std::istream& Arrangement::read(std::istream& in)
 	in.getline(temp, 1024, '\n');
 	if (strncmp(temp, "(*)", 3) == 0) {
 		holiday = true;
-		in.seekg(0, std::ios::beg);
 		in.seekg(position);
-		in.ignore(4, ' ');
+		in.ignore(13);
 
 		day.read(in);
 	}
 	else {
 		setHoliday(false);
 
+		in.seekg(position);
+		
+		in.ignore(18);
+		in.getline(temp, 1024, '\n');
 		setName(temp);
 
+		in.ignore(6, ' ');
 		in.getline(temp, 1024, '\n');
 		setNote(temp);
 
+		in.ignore(4, ' ');
 		day.read(in);
 
+		in.ignore(4, ' ');
 		time.start.read(in);
 		in.ignore(3, ' - ');
 		in >> time.end;
@@ -165,16 +170,16 @@ std::istream& Arrangement::read(std::istream& in)
 std::ostream& Arrangement::write(std::ostream& out) const
 {
 	if (!holiday) {
-		out << this->name << '\n'
-			<< this->note << '\n';
+		out << "Arrangement with: "<<this->name << "\nNote: "
+			<< this->note << "\nOn: ";
 		this->day.write(out);
-		out << '\n';
+		out << "\nAt: ";
 		this->time.start.write(out);
 		out << " - ";
 		this->time.end.write(out);
 	}
 	else {
-		out << "(*) ";
+		out << "(*) Holiday: ";
 		this->day.write(out);
 	}
 

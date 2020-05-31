@@ -67,7 +67,7 @@ void Date::print() const
 	this->write(std::cout);
 }
 
-/** @brief връща истина ако датата, с която сме извикали тази функция е преди подадената */
+/** @brief предефинира оператор< ; Връща истина ако датата, с която сме извикали тази функция е преди подадената */
 bool Date::operator<(const Date& other) const
 {
 	if (this->year < other.year) return true;

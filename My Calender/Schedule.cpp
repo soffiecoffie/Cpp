@@ -336,6 +336,7 @@ void Schedule::open(std::string input)
 			write(out);
 			setUserFile(input);
 			isOpen = 1;
+			std::cout << "Successfully created a new file " << input << std::endl;
 
 		}
 	}
@@ -345,8 +346,8 @@ void Schedule::open(std::string input)
 		setUserFile(input);
 
 		isOpen = 1;
+		std::cout << "Successfully opened file " << input << std::endl;
 	}
-	std::cout << "Successfully opened file " << input << std::endl;
 }
 
 /** @brief затваря календара */

@@ -1,5 +1,5 @@
-﻿#ifndef CMDVALIDATOR__H
-#define CMDVALIDATOR__H
+﻿#ifndef CMDVALIDATOR_H
+#define CMDVALIDATOR_H
 
 #include "ICommand.h"
 

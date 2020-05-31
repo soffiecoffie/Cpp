@@ -24,7 +24,7 @@ void HolidayCommand::execute(std::string input) const
 		Date day = day.stringToDate(date);
 
 		s->holiday(day);
-		std::cout << "Successfuly marked" << day << "as a holiday\n";
+		std::cout << "Successfuly marked " << day << " as a holiday\n";
 	}
 	else
 		std::cout << "You can't use this command until you open a file!\n";

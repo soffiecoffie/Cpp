@@ -46,20 +46,20 @@ void Time::setMinutes(int _minutes)
 	minutes = _minutes;
 }
 
-/** @brief проверява дали времето е по-рано от подаденото */
+/** @brief предефинира оператор < ; проверява дали времето е по-рано от подаденото */
 bool Time::operator<(const Time& other) const
 {
 	if (this->hour == other.hour)return this->minutes < other.minutes;
 	return this->hour < other.hour;
 }
 
-/** @brief проверява дали времето съвпада с подаденото */
+/** @brief предефинира оператор == ; проверява дали времето съвпада с подаденото */
 bool Time::operator==(const Time& other) const
 {
 	return hour == other.hour && minutes == other.minutes;
 }
 
-/** @brief предефинира оператор == */
+/** @brief предефинира оператор = */
 Time& Time::operator=(const Time& other) 
 {
 	if (this != &other) {

@@ -1,12 +1,11 @@
 #include <iostream>
-#include <string>
 #include "Schedule.h"
 #include "Invoker.h"
 
 int main()
 {
 	std::cout << "Welcome to your personal calendar!\n";
-	std::cout << "To open or create a new calendar write \"open <filename>\":\n";
+	std::cout << "To open or create a new calendar write open <filename>:\n\n";
 	Schedule s;
 	
 	ISchedule* sptr = &s;
